@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reports — Food Waste Tracker</title>
+  <meta name="description" content="View daily, monthly, and food item waste reports with CSV export.">
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🍽️</div>
+      <div class="logo-text">Food Waste<span>Tracker</span></div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+      <a href="menu.html" class="nav-item"><span class="nav-icon">📋</span> Menus</a>
+      <a href="waste-entry.html" class="nav-item"><span class="nav-icon">♻️</span> Log Waste</a>
+      <div class="nav-section-label">Analytics</div>
+      <a href="reports.html" class="nav-item active"><span class="nav-icon">📈</span> Reports</a>
+      <div class="nav-section-label">System</div>
+      <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" data-user-avatar>A</div>
+        <div class="user-meta">
+          <div class="user-name" data-user-name>Loading...</div>
+          <div class="user-role" data-user-role>—</div>
+        </div>
+      </div>
+      <button id="logout-btn" class="btn btn-ghost btn-sm btn-block">🚪 Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div>
+      <div class="topbar-title">Reports & Analytics</div>
+      <div class="topbar-subtitle">Filter and export waste data</div>
+    </div>
+    <div class="topbar-right">
+      <button id="export-csv-btn" class="btn btn-secondary btn-sm">⬇️ Export CSV</button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content page-content">
+    <div class="page-header">
+      <h1>Waste Reports</h1>
+      <p>Explore detailed waste data filtered by day, month, or food item.</p>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="daily">📅 Daily</button>
+      <button class="tab-btn" data-tab="monthly">📆 Monthly</button>
+      <button class="tab-btn" data-tab="food-stats">🥘 By Food Item</button>
+    </div>
+
+    <!-- Filter Panels -->
+    <div class="card" style="margin-bottom:var(--space-5)">
+      <!-- Daily Filters -->
+      <div data-tab-panel="daily" style="display:flex;align-items:flex-end;gap:var(--space-4)">
+        <div class="form-group" style="margin:0">
+          <label class="form-label">Select Date</label>
+          <input type="date" id="report-date" class="form-control">
+        </div>
+        <button class="btn btn-secondary" onclick="loadDailyReport()">🔍 View Report</button>
+      </div>
+
+      <!-- Monthly Filters -->
+      <div data-tab-panel="monthly" style="display:none;align-items:flex-end;gap:var(--space-4)">
+        <div class="form-group" style="margin:0">
+          <label class="form-label">Year</label>
+          <select id="report-year" class="form-control" style="width:100px">
+            <option>2024</option>
+            <option>2025</option>
+            <option>2026</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin:0">
+          <label class="form-label">Month</label>
+          <select id="report-month" class="form-control" style="width:140px">
+            <option value="1">January</option>
+            <option value="2">February</option>
+            <option value="3">March</option>
+            <option value="4">April</option>
+            <option value="5">May</option>
+            <option value="6">June</option>
+            <option value="7">July</option>
+            <option value="8">August</option>
+            <option value="9">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+          </select>
+        </div>
+        <button class="btn btn-secondary" onclick="loadMonthlyReport()">🔍 View Report</button>
+      </div>
+
+      <!-- Food Stats (no filter, loads all-time) -->
+      <div data-tab-panel="food-stats" style="display:none">
+        <p style="color:var(--txt-secondary);font-size:var(--text-sm)">
+          Showing all-time statistics for each food item.
+        </p>
+      </div>
+    </div>
+
+    <!-- Totals Summary -->
+    <div class="grid-2" style="margin-bottom:var(--space-5)">
+      <div class="stat-card green">
+        <div class="stat-icon">🗑️</div>
+        <div class="stat-value" id="total-waste">—</div>
+        <div class="stat-label">Total Waste (selected period)</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-icon">🌿</div>
+        <div class="stat-value" id="total-co2">—</div>
+        <div class="stat-label">Total CO₂ Emitted</div>
+      </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="card">
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead id="report-thead">
+            <tr>
+              <th>Date</th><th>Meal</th><th>Food Item</th><th>Category</th>
+              <th>Qty Planned</th><th>Qty Wasted</th><th>Waste %</th><th>CO₂ Emitted</th>
+            </tr>
+          </thead>
+          <tbody id="report-tbody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast-container"></div>
+
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/reports.js"></script>
+</body>
+</html>

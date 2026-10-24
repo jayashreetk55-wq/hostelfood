@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menus — Food Waste Tracker</title>
+  <meta name="description" content="View and manage daily hostel mess menus.">
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🍽️</div>
+      <div class="logo-text">Food Waste<span>Tracker</span></div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+      <a href="menu.html" class="nav-item active"><span class="nav-icon">📋</span> Menus</a>
+      <a href="waste-entry.html" class="nav-item"><span class="nav-icon">♻️</span> Log Waste</a>
+      <div class="nav-section-label">Analytics</div>
+      <a href="reports.html" class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+      <div class="nav-section-label">System</div>
+      <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" data-user-avatar>A</div>
+        <div class="user-meta">
+          <div class="user-name" data-user-name>Loading...</div>
+          <div class="user-role" data-user-role>—</div>
+        </div>
+      </div>
+      <button id="logout-btn" class="btn btn-ghost btn-sm btn-block">🚪 Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div>
+      <div class="topbar-title">Daily Menus</div>
+      <div class="topbar-subtitle">Manage what's cooked each meal</div>
+    </div>
+    <div class="topbar-right">
+      <button id="create-menu-btn" class="btn btn-primary btn-sm" onclick="openModal('create-menu-modal')">
+        + Create Menu
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content page-content">
+    <div class="page-header">
+      <h1>Mess Menus</h1>
+      <p>Create daily menus and add food items to track what was planned to be cooked.</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-bar card" style="padding:var(--space-4)">
+      <div class="form-group" style="margin:0;flex:1;max-width:200px">
+        <label class="form-label">Filter by Date</label>
+        <input type="date" id="filter-date" class="form-control">
+      </div>
+      <div class="form-group" style="margin:0;flex:1;max-width:200px">
+        <label class="form-label">Filter by Meal</label>
+        <select id="filter-meal" class="form-control">
+          <option value="">All Meals</option>
+          <option value="breakfast">🌅 Breakfast</option>
+          <option value="lunch">☀️ Lunch</option>
+          <option value="dinner">🌙 Dinner</option>
+        </select>
+      </div>
+      <div style="align-self:flex-end">
+        <button class="btn btn-secondary" onclick="loadMenus()">🔄 Refresh</button>
+      </div>
+    </div>
+
+    <!-- Menus Table -->
+    <div class="card" style="margin-top:var(--space-6)">
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Meal Type</th>
+              <th>Created By</th>
+              <th>Created At</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="menus-tbody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+      <div id="menus-empty" class="empty-state" style="display:none">
+        <div class="empty-icon">📋</div>
+        <p>No menus found for the selected filters.<br>
+          <a href="#" onclick="openModal('create-menu-modal')" style="color:var(--clr-primary-light)">Create the first menu</a>
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <!-- ── Create Menu Modal ───────────────────────────────── -->
+  <div class="modal-overlay" id="create-menu-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Create New Menu</h2>
+        <button class="modal-close" onclick="closeModal('create-menu-modal')">✕</button>
+      </div>
+      <form id="create-menu-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="new-menu-date">Date</label>
+            <input type="date" id="new-menu-date" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="new-menu-meal">Meal Type</label>
+            <select id="new-menu-meal" class="form-control" required>
+              <option value="breakfast">🌅 Breakfast</option>
+              <option value="lunch">☀️ Lunch</option>
+              <option value="dinner">🌙 Dinner</option>
+            </select>
+          </div>
+        </div>
+        <p class="form-hint">After creating the menu, you'll be able to add food items to it.</p>
+        <div style="display:flex;gap:var(--space-3);margin-top:var(--space-4)">
+          <button type="submit" class="btn btn-primary" style="flex:1">✅ Create Menu</button>
+          <button type="button" class="btn btn-secondary" onclick="closeModal('create-menu-modal')">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Menu Detail Modal ───────────────────────────────── -->
+  <div class="modal-overlay" id="detail-modal">
+    <div class="modal" style="max-width:640px">
+      <div class="modal-header">
+        <h2 class="modal-title" id="detail-title">Menu Details</h2>
+        <button class="modal-close" onclick="closeModal('detail-modal')">✕</button>
+      </div>
+
+      <div id="detail-items">
+        <!-- Items table injected by JS -->
+      </div>
+
+      <!-- Add Item Section (managers/admins only) -->
+      <div id="add-item-section" style="margin-top:var(--space-6)">
+        <div class="divider"></div>
+        <h3 style="font-size:var(--text-base);font-weight:700;margin-bottom:var(--space-4)">➕ Add Food Item</h3>
+        <form id="add-item-form">
+          <input type="hidden" id="add-item-menu-id">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="add-item-food">Food Item</label>
+              <select id="add-item-food" class="form-control" required>
+                <option value="">Select item...</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="add-item-qty">Planned Quantity</label>
+              <input type="number" id="add-item-qty" class="form-control" min="0.01" step="0.01" placeholder="e.g. 20" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm">➕ Add Item</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/menu.js"></script>
+</body>
+</html>

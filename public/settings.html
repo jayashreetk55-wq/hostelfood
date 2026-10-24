@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings — Food Waste Tracker</title>
+  <meta name="description" content="Manage food items and emission factors for the hostel mess tracker.">
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🍽️</div>
+      <div class="logo-text">Food Waste<span>Tracker</span></div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+      <a href="menu.html" class="nav-item"><span class="nav-icon">📋</span> Menus</a>
+      <a href="waste-entry.html" class="nav-item"><span class="nav-icon">♻️</span> Log Waste</a>
+      <div class="nav-section-label">Analytics</div>
+      <a href="reports.html" class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+      <div class="nav-section-label">System</div>
+      <a href="settings.html" class="nav-item active"><span class="nav-icon">⚙️</span> Settings</a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" data-user-avatar>A</div>
+        <div class="user-meta">
+          <div class="user-name" data-user-name>Loading...</div>
+          <div class="user-role" data-user-role>—</div>
+        </div>
+      </div>
+      <button id="logout-btn" class="btn btn-ghost btn-sm btn-block">🚪 Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div>
+      <div class="topbar-title">Settings</div>
+      <div class="topbar-subtitle">Manage food items and emission factors</div>
+    </div>
+    <div class="topbar-right">
+      <button id="add-item-btn" class="btn btn-primary btn-sm">+ Add Food Item</button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content page-content">
+    <div class="page-header">
+      <h1>Food Items & Emission Factors</h1>
+      <p>Manage the master list of food items and their carbon emission factors (kg CO₂ per kg wasted).</p>
+    </div>
+
+    <!-- Admin notice for non-admins -->
+    <div id="admin-notice" class="co2-banner medium" style="display:none;margin-bottom:var(--space-5)">
+      <span>🔒</span><span>You have view-only access. Only admins can add, edit, or delete food items.</span>
+    </div>
+
+    <!-- Emission Factor Guide -->
+    <div class="card" style="margin-bottom:var(--space-6)">
+      <div class="card-header">
+        <div class="card-title">ℹ️ What is an Emission Factor?</div>
+      </div>
+      <p style="color:var(--txt-secondary);font-size:var(--text-sm);line-height:1.8">
+        The emission factor is the amount of CO₂ equivalent (kg) emitted per kg of food wasted.
+        These values are based on <strong style="color:var(--txt-primary)">IPCC / FAO life-cycle assessments</strong>
+        covering farming, transport, processing, and decomposition.
+        Higher values = more carbon-intensive to produce.
+      </p>
+      <div class="grid-4" style="margin-top:var(--space-5)">
+        <div style="text-align:center;padding:var(--space-3);background:var(--bg-card-2);border-radius:var(--radius-md)">
+          <div style="font-size:1.5rem">🥩</div>
+          <div style="font-size:var(--text-lg);font-weight:800;color:var(--clr-danger)">27.0</div>
+          <div style="font-size:var(--text-xs);color:var(--txt-secondary)">Beef / Mutton</div>
+        </div>
+        <div style="text-align:center;padding:var(--space-3);background:var(--bg-card-2);border-radius:var(--radius-md)">
+          <div style="font-size:1.5rem">🍚</div>
+          <div style="font-size:var(--text-lg);font-weight:800;color:var(--clr-accent-light)">2.7</div>
+          <div style="font-size:var(--text-xs);color:var(--txt-secondary)">Rice</div>
+        </div>
+        <div style="text-align:center;padding:var(--space-3);background:var(--bg-card-2);border-radius:var(--radius-md)">
+          <div style="font-size:1.5rem">🥦</div>
+          <div style="font-size:var(--text-lg);font-weight:800;color:var(--clr-primary-light)">0.4</div>
+          <div style="font-size:var(--text-xs);color:var(--txt-secondary)">Vegetables</div>
+        </div>
+        <div style="text-align:center;padding:var(--space-3);background:var(--bg-card-2);border-radius:var(--radius-md)">
+          <div style="font-size:1.5rem">🍎</div>
+          <div style="font-size:var(--text-lg);font-weight:800;color:var(--clr-primary-light)">0.3</div>
+          <div style="font-size:var(--text-xs);color:var(--txt-secondary)">Fruits</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Food Items Table -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">🥘 Food Items</div>
+        <div class="card-subtitle" style="font-size:var(--text-xs)">
+          Emission Factor unit: kg CO₂e per kg of food wasted
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Food Item</th>
+              <th>Category</th>
+              <th>Unit</th>
+              <th>Emission Factor</th>
+              <th>Added On</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="food-items-tbody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add / Edit Food Item Modal -->
+  <div class="modal-overlay" id="item-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="item-modal-title">Add Food Item</h2>
+        <button id="close-item-modal" class="modal-close">✕</button>
+      </div>
+      <form id="item-form" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="item-name">Food Name</label>
+          <input type="text" id="item-name" class="form-control" placeholder="e.g. Rice" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="item-category">Category</label>
+            <select id="item-category" class="form-control" required>
+              <option value="Grain">🌾 Grain</option>
+              <option value="Legume">🫘 Legume</option>
+              <option value="Vegetable">🥦 Vegetable</option>
+              <option value="Fruit">🍎 Fruit</option>
+              <option value="Dairy">🥛 Dairy</option>
+              <option value="Non-Veg">🍗 Non-Veg</option>
+              <option value="Other">📦 Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="item-unit">Unit of Measurement</label>
+            <select id="item-unit" class="form-control" required>
+              <option value="kg">kg</option>
+              <option value="litres">litres</option>
+              <option value="pieces">pieces</option>
+              <option value="grams">grams</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="item-ef">Emission Factor (kg CO₂e per kg wasted)</label>
+          <input type="number" id="item-ef" class="form-control" min="0" step="0.01" placeholder="e.g. 2.7" required>
+          <p class="form-hint">Reference: Vegetables ≈ 0.4 · Rice ≈ 2.7 · Dairy ≈ 3.2 · Meat ≈ 6–27</p>
+        </div>
+        <div style="display:flex;gap:var(--space-3);margin-top:var(--space-4)">
+          <button type="submit" class="btn btn-primary" style="flex:1">💾 Save</button>
+          <button type="button" class="btn btn-secondary" onclick="closeItemModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/settings.js"></script>
+</body>
+</html>

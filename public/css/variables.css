@@ -1,0 +1,82 @@
+/* ============================================================
+   variables.css — Design tokens for the entire application
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  /* ── Brand Colors ─────────────────────────────── */
+  --clr-primary:        #16a34a;   /* deep green */
+  --clr-primary-light:  #22c55e;
+  --clr-primary-dark:   #15803d;
+  --clr-primary-glow:   rgba(34, 197, 94, 0.18);
+
+  --clr-accent:         #f59e0b;   /* amber */
+  --clr-accent-light:   #fbbf24;
+  --clr-danger:         #ef4444;
+  --clr-danger-light:   #fca5a5;
+  --clr-info:           #3b82f6;
+  --clr-info-light:     #93c5fd;
+
+  /* ── Dark Background Palette ──────────────────── */
+  --bg-base:      #0d1117;
+  --bg-surface:   #161b22;
+  --bg-card:      #1c2330;
+  --bg-card-2:    #21293a;
+  --bg-hover:     #263143;
+  --bg-input:     #0d1117;
+
+  /* ── Text ─────────────────────────────────────── */
+  --txt-primary:  #e6edf3;
+  --txt-secondary:#8b949e;
+  --txt-muted:    #484f58;
+  --txt-link:     #22c55e;
+
+  /* ── Borders ──────────────────────────────────── */
+  --border:       rgba(255,255,255,0.08);
+  --border-focus: var(--clr-primary);
+
+  /* ── Elevation Shadows ────────────────────────── */
+  --shadow-sm:    0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md:    0 4px 16px rgba(0,0,0,0.45);
+  --shadow-lg:    0 8px 32px rgba(0,0,0,0.55);
+  --shadow-glow:  0 0 20px var(--clr-primary-glow);
+
+  /* ── Radius ───────────────────────────────────── */
+  --radius-sm:    6px;
+  --radius-md:    10px;
+  --radius-lg:    16px;
+  --radius-xl:    24px;
+  --radius-pill:  999px;
+
+  /* ── Typography ───────────────────────────────── */
+  --font:         'Inter', system-ui, sans-serif;
+  --text-xs:      0.75rem;
+  --text-sm:      0.875rem;
+  --text-base:    1rem;
+  --text-lg:      1.125rem;
+  --text-xl:      1.25rem;
+  --text-2xl:     1.5rem;
+  --text-3xl:     1.875rem;
+  --text-4xl:     2.25rem;
+
+  /* ── Spacing ──────────────────────────────────── */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-5:  1.25rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  /* ── Transitions ──────────────────────────────── */
+  --ease:   cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-sm: 150ms;
+  --dur-md: 250ms;
+  --dur-lg: 400ms;
+
+  /* ── Sidebar ──────────────────────────────────── */
+  --sidebar-w: 240px;
+  --topbar-h:  64px;
+}

@@ -1,0 +1,106 @@
+/* ============================================================
+   animations.css — Keyframes, transitions, micro-animations
+   ============================================================ */
+
+/* ── Keyframes ───────────────────────────────────────────── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 var(--clr-primary-glow); }
+  50%       { box-shadow: 0 0 0 8px transparent; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Utility Animation Classes ───────────────────────────── */
+.anim-fade-in     { animation: fadeIn    var(--dur-md) var(--ease) both; }
+.anim-fade-in-up  { animation: fadeInUp  var(--dur-md) var(--ease) both; }
+.anim-fade-in-down{ animation: fadeInDown var(--dur-md) var(--ease) both; }
+.anim-scale-in    { animation: scaleIn   var(--dur-md) var(--ease) both; }
+
+/* Staggered children */
+.stagger-children > * { animation: fadeInUp var(--dur-md) var(--ease) both; }
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 60ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 120ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 180ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 240ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 300ms; }
+
+/* ── Skeleton Loading ────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-card) 25%,
+    var(--bg-hover) 50%,
+    var(--bg-card) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-md);
+  color: transparent !important;
+}
+.skeleton * { visibility: hidden !important; }
+
+/* ── Hover Lift ──────────────────────────────────────────── */
+.hover-lift {
+  transition: transform var(--dur-sm) var(--ease), box-shadow var(--dur-sm) var(--ease);
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ── Floating Decoration (login page) ───────────────────── */
+.float-icon { animation: float 4s ease-in-out infinite; }
+.float-icon:nth-child(2) { animation-delay: 1.5s; }
+.float-icon:nth-child(3) { animation-delay: 3s; }
+
+/* ── Page transition ─────────────────────────────────────── */
+.page-content { animation: fadeInUp 0.3s var(--ease) both; }
+
+/* ── Number counter ──────────────────────────────────────── */
+.count-updated { animation: countUp 0.4s var(--ease) both; }
+
+/* ── Green glow pulse ────────────────────────────────────── */
+.glow-pulse { animation: pulse-glow 2s ease-in-out infinite; }

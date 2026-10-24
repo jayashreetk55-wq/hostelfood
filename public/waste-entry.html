@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log Waste — Food Waste Tracker</title>
+  <meta name="description" content="Log food waste and automatically calculate carbon emissions for college hostel meals.">
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/animations.css">
+
+  <style>
+    .entry-grid {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: var(--space-6);
+      align-items: start;
+    }
+    @media (max-width: 1100px) { .entry-grid { grid-template-columns: 1fr; } }
+
+    .preview-card {
+      background: linear-gradient(135deg, var(--bg-card-2), var(--bg-card));
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      margin-top: var(--space-5);
+    }
+    .preview-card h3 { font-size: var(--text-sm); font-weight: 700; margin-bottom: var(--space-4); color: var(--txt-secondary); text-transform: uppercase; letter-spacing: 0.06em; }
+    .preview-row { display: flex; justify-content: space-between; align-items: center; padding: var(--space-3) 0; border-bottom: 1px solid var(--border); font-size: var(--text-sm); }
+    .preview-row:last-child { border-bottom: none; }
+    .preview-row .label { color: var(--txt-secondary); }
+    .preview-row .value { font-weight: 700; color: var(--txt-primary); }
+    .preview-row .value.green { color: var(--clr-primary-light); }
+    .preview-row .value.amber { color: var(--clr-accent-light); }
+  </style>
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🍽️</div>
+      <div class="logo-text">Food Waste<span>Tracker</span></div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+      <a href="menu.html" class="nav-item"><span class="nav-icon">📋</span> Menus</a>
+      <a href="waste-entry.html" class="nav-item active"><span class="nav-icon">♻️</span> Log Waste</a>
+      <div class="nav-section-label">Analytics</div>
+      <a href="reports.html" class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+      <div class="nav-section-label">System</div>
+      <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" data-user-avatar>A</div>
+        <div class="user-meta">
+          <div class="user-name" data-user-name>Loading...</div>
+          <div class="user-role" data-user-role>—</div>
+        </div>
+      </div>
+      <button id="logout-btn" class="btn btn-ghost btn-sm btn-block">🚪 Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div>
+      <div class="topbar-title">Log Food Waste</div>
+      <div class="topbar-subtitle">Record waste after each meal</div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content page-content">
+    <div class="page-header">
+      <h1>Log Food Waste</h1>
+      <p>Select a date, meal, and food item — then enter how much was wasted. CO₂ is calculated automatically.</p>
+    </div>
+
+    <div class="entry-grid">
+      <!-- LEFT: Entry Form -->
+      <div>
+        <div class="card" id="entry-form-section">
+          <div class="card-header">
+            <div class="card-title">📝 New Waste Entry</div>
+          </div>
+
+          <form id="waste-entry-form" novalidate>
+            <!-- Date -->
+            <div class="form-group">
+              <label class="form-label" for="entry-date">Date</label>
+              <input type="date" id="entry-date" class="form-control" required>
+            </div>
+
+            <!-- Meal Selector (loaded from API) -->
+            <div class="form-group">
+              <label class="form-label" for="entry-meal">Meal</label>
+              <select id="entry-meal" class="form-control" required>
+                <option value="">Select meal...</option>
+              </select>
+              <p class="form-hint">Only meals with a menu for the selected date are shown.</p>
+            </div>
+
+            <!-- Food Item Selector (loaded from selected menu) -->
+            <div class="form-group">
+              <label class="form-label" for="entry-item">Food Item</label>
+              <select id="entry-item" class="form-control" required>
+                <option value="">Select food item...</option>
+              </select>
+            </div>
+
+            <!-- Quantity Wasted -->
+            <div class="form-group">
+              <label class="form-label" for="entry-qty">Quantity Wasted</label>
+              <input type="number" id="entry-qty" class="form-control" min="0" step="0.01" placeholder="Enter amount wasted" required>
+              <p class="form-hint">Use the same unit shown in the food item dropdown.</p>
+            </div>
+
+            <!-- Notes -->
+            <div class="form-group">
+              <label class="form-label" for="entry-notes">Notes (Optional)</label>
+              <input type="text" id="entry-notes" class="form-control" placeholder="e.g. Power cut caused delay...">
+            </div>
+
+            <!-- Live CO₂ Preview -->
+            <div id="preview-section" style="display:none">
+              <div class="preview-card">
+                <h3>⚡ Live Preview</h3>
+                <div class="preview-row">
+                  <span class="label">Planned Quantity</span>
+                  <span class="value green" id="preview-planned">—</span>
+                </div>
+                <div class="preview-row">
+                  <span class="label">Waste Percentage</span>
+                  <span class="value amber" id="preview-waste-pct">—</span>
+                </div>
+                <div class="preview-row">
+                  <span class="label">Carbon Emission</span>
+                  <span class="value amber" id="preview-co2">—</span>
+                </div>
+              </div>
+              <div id="preview-level" class="co2-banner low" style="margin-top:var(--space-3);display:none">—</div>
+            </div>
+
+            <button id="waste-submit" type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top:var(--space-5)">
+              💾 Log Waste
+            </button>
+          </form>
+        </div>
+
+        <!-- Viewer notice -->
+        <div class="card" id="viewer-notice" style="display:none">
+          <p style="color:var(--txt-secondary);text-align:center;padding:var(--space-4)">
+            👁️ You have view-only access. Only managers and admins can log waste.
+          </p>
+        </div>
+      </div>
+
+      <!-- RIGHT: Waste Entries Table -->
+      <div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📜 Waste Entries</div>
+            <div style="display:flex;gap:var(--space-3)">
+              <input type="date" id="filter-start" class="form-control" style="width:auto">
+              <input type="date" id="filter-end"   class="form-control" style="width:auto">
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date</th><th>Meal</th><th>Food Item</th>
+                  <th>Wasted</th><th>Waste %</th><th>CO₂</th>
+                  <th>Logged By</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="waste-tbody"></tbody>
+            </table>
+          </div>
+          <div id="waste-empty" class="empty-state" style="display:none">
+            <div class="empty-icon">🎉</div>
+            <p>No waste entries found for this date range!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Edit Waste Modal -->
+  <div class="modal-overlay" id="edit-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">✏️ Edit Waste Entry</h2>
+        <button class="modal-close" onclick="document.getElementById('edit-modal').classList.remove('active')">✕</button>
+      </div>
+      <form id="edit-waste-form">
+        <input type="hidden" id="edit-waste-id">
+        <div class="form-group">
+          <label class="form-label">Quantity Wasted (corrected)</label>
+          <input type="number" id="edit-qty" class="form-control" min="0" step="0.01" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <input type="text" id="edit-notes" class="form-control" placeholder="Reason for correction...">
+        </div>
+        <div style="display:flex;gap:var(--space-3)">
+          <button type="submit" class="btn btn-primary" style="flex:1">Save Changes</button>
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('edit-modal').classList.remove('active')">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/waste-entry.js"></script>
+  <script>
+    // Show viewer notice if role is viewer
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        const role = document.querySelector('[data-user-role]')?.textContent;
+        if (role === 'viewer') {
+          document.getElementById('entry-form-section').style.display = 'none';
+          document.getElementById('viewer-notice').style.display = 'block';
+        }
+      }, 1000);
+    });
+  </script>
+</body>
+</html>

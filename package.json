@@ -1,0 +1,36 @@
+{
+  "name": "college-hostel-food-waste-tracker",
+  "version": "1.0.0",
+  "description": "A web application to track food waste and carbon emissions in a college hostel mess",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js",
+    "migrate": "node server/db/migrate.js",
+    "seed": "node server/utils/seedData.js"
+  },
+  "keywords": [
+    "food-waste",
+    "hostel",
+    "carbon-emission",
+    "tracker"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "sqlite3": "^5.1.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.3",
+    "express-session": "^1.18.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  },
+  "allowScripts": {
+    "bcrypt@5.1.1": true,
+    "sqlite3@5.1.7": true,
+    "fsevents@2.3.3": true
+  }
+}

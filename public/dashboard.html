@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Food Waste Tracker</title>
+  <meta name="description" content="Real-time dashboard showing food waste statistics and carbon emissions for college hostel.">
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🍽️</div>
+      <div class="logo-text">Food Waste<span>Tracker</span></div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a href="dashboard.html" class="nav-item active" id="nav-dashboard">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+      <a href="menu.html" class="nav-item" id="nav-menu">
+        <span class="nav-icon">📋</span> Menus
+      </a>
+      <a href="waste-entry.html" class="nav-item" id="nav-waste">
+        <span class="nav-icon">♻️</span> Log Waste
+      </a>
+      <div class="nav-section-label">Analytics</div>
+      <a href="reports.html" class="nav-item" id="nav-reports">
+        <span class="nav-icon">📈</span> Reports
+      </a>
+      <div class="nav-section-label">System</div>
+      <a href="settings.html" class="nav-item" id="nav-settings">
+        <span class="nav-icon">⚙️</span> Settings
+      </a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" data-user-avatar>A</div>
+        <div class="user-meta">
+          <div class="user-name" data-user-name>Loading...</div>
+          <div class="user-role" data-user-role>—</div>
+        </div>
+      </div>
+      <button id="logout-btn" class="btn btn-ghost btn-sm btn-block">🚪 Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div>
+      <div class="topbar-title">Dashboard</div>
+      <div class="topbar-subtitle" id="topbar-date">—</div>
+    </div>
+    <div class="topbar-right">
+      <a href="waste-entry.html" class="btn btn-primary btn-sm">+ Log Waste</a>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content page-content">
+    <div class="page-header">
+      <h1>Food Waste Overview</h1>
+      <p>Today's snapshot — waste logged, carbon emissions, and trends at a glance.</p>
+    </div>
+
+    <!-- Carbon Context Banner -->
+    <div id="carbon-banner" class="co2-banner low" style="margin-bottom:var(--space-6)">
+      <span>🟢</span><span>Loading carbon footprint context...</span>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="stats-grid stagger-children">
+      <div class="stat-card green hover-lift">
+        <div class="stat-icon">🗑️</div>
+        <div class="stat-value" id="stat-waste">0.00</div>
+        <div class="stat-label">kg Wasted Today</div>
+      </div>
+      <div class="stat-card amber hover-lift">
+        <div class="stat-icon">🌿</div>
+        <div class="stat-value" id="stat-co2">0.000</div>
+        <div class="stat-label">kg CO₂ Emitted Today</div>
+      </div>
+      <div class="stat-card blue hover-lift">
+        <div class="stat-icon">🍽️</div>
+        <div class="stat-value" id="stat-meals">0</div>
+        <div class="stat-label">Meals Logged Today</div>
+      </div>
+      <div class="stat-card green hover-lift">
+        <div class="stat-icon">📉</div>
+        <div class="stat-value" id="stat-reduction">0.0</div>
+        <div class="stat-label">% Weekly Change</div>
+        <div class="stat-change" id="stat-reduction-change">vs. last week</div>
+      </div>
+    </div>
+
+    <!-- Main Charts Grid -->
+    <div class="charts-grid">
+      <!-- Weekly Bar Chart -->
+      <div class="chart-card card hover-lift">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Weekly Waste & CO₂</div>
+            <div class="card-subtitle">Last 7 days — kg wasted vs. CO₂ emitted</div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chart-weekly"></canvas>
+        </div>
+      </div>
+
+      <!-- Meal Distribution Doughnut -->
+      <div class="chart-card card hover-lift">
+        <div class="card-header">
+          <div>
+            <div class="card-title">By Meal Type</div>
+            <div class="card-subtitle">Last 30 days distribution</div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chart-meal"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Charts Row -->
+    <div class="charts-grid-bottom">
+      <!-- CO₂ Trend Line -->
+      <div class="chart-card card hover-lift" style="grid-column: span 2">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Carbon Emission Trend</div>
+            <div class="card-subtitle">Daily CO₂ over the last 30 days</div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chart-emissions"></canvas>
+        </div>
+      </div>
+
+      <!-- Top Wasted Items -->
+      <div class="chart-card card hover-lift">
+        <div class="card-header">
+          <div>
+            <div class="card-title">🏆 Top Wasted</div>
+            <div class="card-subtitle">Most wasted food items (30 days)</div>
+          </div>
+        </div>
+        <div class="top-wasted-list" id="top-wasted-list">
+          <!-- Populated by JS -->
+          <div class="skeleton" style="height:40px;margin-bottom:8px">&nbsp;</div>
+          <div class="skeleton" style="height:40px;margin-bottom:8px">&nbsp;</div>
+          <div class="skeleton" style="height:40px;margin-bottom:8px">&nbsp;</div>
+          <div class="skeleton" style="height:40px;margin-bottom:8px">&nbsp;</div>
+          <div class="skeleton" style="height:40px">&nbsp;</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
