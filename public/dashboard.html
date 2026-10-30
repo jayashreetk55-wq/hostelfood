@@ -88,16 +88,16 @@
       <span>🟢</span><span>Loading carbon footprint context...</span>
     </div>
 
-    <!-- 6 Stat Cards -->
-    <div class="stats-grid stagger-children" style="grid-template-columns: repeat(auto-fit, minmax(210px, 1fr))">
-      <!-- 1. Food Wasted Today -->
+    <!-- Primary KPI Stat Cards (6 Cards) -->
+    <div class="stats-grid stagger-children" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr))">
+      <!-- 1. Total Food Waste Today -->
       <div class="stat-card green hover-lift">
         <div class="stat-icon">🗑️</div>
         <div class="stat-value" id="stat-waste">0.00</div>
-        <div class="stat-label">kg Wasted Today</div>
+        <div class="stat-label">kg Food Waste Today</div>
       </div>
 
-      <!-- 2. CO2e Emissions Today -->
+      <!-- 2. Total CO2e Emissions Today -->
       <div class="stat-card amber hover-lift">
         <div class="stat-icon">🌿</div>
         <div class="stat-value" id="stat-co2">0.000</div>
@@ -115,22 +115,61 @@
       <div class="stat-card green hover-lift">
         <div class="stat-icon">📉</div>
         <div class="stat-value" id="stat-reduction">0.0%</div>
-        <div class="stat-label">% Weekly Change</div>
+        <div class="stat-label">% Weekly Reduction</div>
         <div class="stat-change" id="stat-reduction-change">vs. last week</div>
       </div>
 
-      <!-- 5. Food Prepared Today -->
-      <div class="stat-card blue hover-lift">
-        <div class="stat-icon">🍲</div>
-        <div class="stat-value" id="stat-prepared">0.00</div>
-        <div class="stat-label">kg Prepared Today</div>
-      </div>
-
-      <!-- 6. Monthly Food Waste -->
+      <!-- 5. Monthly Food Waste -->
       <div class="stat-card amber hover-lift">
         <div class="stat-icon">📅</div>
         <div class="stat-value" id="stat-monthly-waste">0.00</div>
-        <div class="stat-label">kg Monthly Food Waste</div>
+        <div class="stat-label">kg Monthly Waste</div>
+      </div>
+
+      <!-- 6. Monthly Carbon Emissions -->
+      <div class="stat-card blue hover-lift">
+        <div class="stat-icon">🌍</div>
+        <div class="stat-value" id="stat-monthly-co2">0.00</div>
+        <div class="stat-label">kg Monthly CO₂e</div>
+      </div>
+    </div>
+
+    <!-- Daily Mess Operational Food Flow Strip (Prepared, Served, Leftover, Discarded) -->
+    <div class="card" style="margin-top:var(--space-4);padding:var(--space-3) var(--space-5);background:var(--bg-card-2);border-color:var(--border-subtle)">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--space-4)">
+        <div style="font-size:var(--text-xs);font-weight:700;color:var(--txt-secondary);text-transform:uppercase;letter-spacing:0.8px">
+          📋 Today's Mess Food Flow:
+        </div>
+        <div style="display:flex;gap:var(--space-6);flex-wrap:wrap;align-items:center">
+          <div style="display:flex;align-items:center;gap:var(--space-2)">
+            <span style="font-size:var(--text-base)">🍲</span>
+            <div>
+              <div style="font-size:var(--text-xs);color:var(--txt-secondary)">Prepared</div>
+              <div style="font-size:var(--text-sm);font-weight:700;color:var(--clr-primary-light)"><span id="stat-prepared">0.00</span> kg</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:var(--space-2)">
+            <span style="font-size:var(--text-base)">🍽️</span>
+            <div>
+              <div style="font-size:var(--text-xs);color:var(--txt-secondary)">Served</div>
+              <div style="font-size:var(--text-sm);font-weight:700;color:var(--clr-info)"><span id="stat-served">0.00</span> kg</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:var(--space-2)">
+            <span style="font-size:var(--text-base)">🍱</span>
+            <div>
+              <div style="font-size:var(--text-xs);color:var(--txt-secondary)">Leftover</div>
+              <div style="font-size:var(--text-sm);font-weight:700;color:var(--clr-warning)"><span id="stat-leftover">0.00</span> kg</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:var(--space-2)">
+            <span style="font-size:var(--text-base)">🗑️</span>
+            <div>
+              <div style="font-size:var(--text-xs);color:var(--txt-secondary)">Discarded</div>
+              <div style="font-size:var(--text-sm);font-weight:700;color:var(--clr-danger)"><span id="stat-discarded">0.00</span> kg</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 

@@ -53,8 +53,10 @@ const api = {
   getMenus:       (q = '')           => request('GET',    `/menus${q}`),
   getMenu:        (id)               => request('GET',    `/menus/${id}`),
   createMenu:     (body)             => request('POST',   '/menus', body),
+  updateMenu:     (id, body)         => request('PUT',    `/menus/${id}`, body),
   deleteMenu:     (id)               => request('DELETE', `/menus/${id}`),
   addMenuItem:    (menuId, body)     => request('POST',   `/menus/${menuId}/items`, body),
+  updateMenuItem: (menuId, itemId, b)=> request('PUT',    `/menus/${menuId}/items/${itemId}`, b),
   removeMenuItem: (menuId, itemId)   => request('DELETE', `/menus/${menuId}/items/${itemId}`),
 
   // Waste (Legacy)
@@ -74,9 +76,13 @@ const api = {
   getMonthlyTrends:    (year = '', hostelId = '') => request('GET', `/dashboard/monthly-trends?year=${year}${hostelId ? '&hostel_id=' + hostelId : ''}`),
 
   // Reports
-  getDailyReport:   (date, hostelId = '')       => request('GET', `/reports/daily?date=${date}${hostelId ? '&hostel_id=' + hostelId : ''}`),
-  getMonthlyReport: (year, month, hostelId = '') => request('GET', `/reports/monthly?year=${year}&month=${month}${hostelId ? '&hostel_id=' + hostelId : ''}`),
-  getFoodItemStats: (s = '', e = '')            => request('GET', `/reports/food-items?startDate=${s}&endDate=${e}`),
+  getDailyReport:      (date, hostelId = '')                     => request('GET', `/reports/daily?date=${date}${hostelId ? '&hostel_id=' + hostelId : ''}`),
+  getWeeklyReport:     (startDate = '', endDate = '', hostelId = '') => request('GET', `/reports/weekly?startDate=${startDate}&endDate=${endDate}${hostelId ? '&hostel_id=' + hostelId : ''}`),
+  getMonthlyReport:    (year, month, hostelId = '')              => request('GET', `/reports/monthly?year=${year}&month=${month}${hostelId ? '&hostel_id=' + hostelId : ''}`),
+  getSemesterReport:   (academicYear = '', semester = '', hostelId = '') => request('GET', `/reports/semester?academic_year=${academicYear}&semester=${semester}${hostelId ? '&hostel_id=' + hostelId : ''}`),
+  getHostelWiseReport: (startDate = '', endDate = '')            => request('GET', `/reports/hostel-wise?startDate=${startDate}&endDate=${endDate}`),
+  getMealWiseReport:   (startDate = '', endDate = '', hostelId = '') => request('GET', `/reports/meal-wise?startDate=${startDate}&endDate=${endDate}${hostelId ? '&hostel_id=' + hostelId : ''}`),
+  getFoodItemStats:    (s = '', e = '')                          => request('GET', `/reports/food-items?startDate=${s}&endDate=${e}`),
 
   // Settings: Food Items Management
   getFoodItems:   ()         => request('GET',    '/settings/food-items'),

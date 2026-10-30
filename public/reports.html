@@ -3,21 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reports — Food Waste Tracker</title>
-  <meta name="description" content="View daily, monthly, and food item waste reports with CSV export.">
+  <title>Reports & Analytics — SIT Hostel Food Waste & Carbon Emission Monitoring System</title>
+  <meta name="description" content="Comprehensive food waste and carbon emission reports for Siddaganga Institute of Technology (SIT), Tumakuru. Filter by day, week, month, semester, hostel, and meal.">
 
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/reset.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/animations.css">
+
+  <style>
+    .report-filter-row {
+      display: flex;
+      align-items: flex-end;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+    }
+    .report-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-4);
+      margin-bottom: var(--space-5);
+    }
+    @media print {
+      body { background: #fff !important; color: #000 !important; }
+      .sidebar, .topbar, .tabs, .filter-container, #export-buttons, #toast-container { display: none !important; }
+      .main-content { margin: 0 !important; padding: 10px !important; }
+      .card { box-shadow: none !important; border: 1px solid #ddd !important; background: #fff !important; }
+      .print-header { display: block !important; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; }
+      .print-header h1 { font-size: 18pt; margin: 0; color: #000; }
+      .print-header p { font-size: 10pt; margin: 4px 0 0; color: #444; }
+      .data-table th { background: #eee !important; color: #000 !important; border: 1px solid #ccc !important; }
+      .data-table td { border: 1px solid #ddd !important; color: #000 !important; }
+    }
+    .print-header { display: none; }
+  </style>
 </head>
 <body>
   <!-- SIDEBAR -->
   <nav class="sidebar">
     <div class="sidebar-logo">
       <div class="logo-icon">🍽️</div>
-      <div class="logo-text">Food Waste<span>Tracker</span></div>
+      <div class="logo-text">SIT Hostel<span>Tracker</span></div>
     </div>
     <div class="sidebar-nav">
       <div class="nav-section-label">Main</div>
@@ -34,8 +61,8 @@
       <div class="user-info">
         <div class="user-avatar" data-user-avatar>A</div>
         <div class="user-meta">
-          <div class="user-name" data-user-name>Loading...</div>
-          <div class="user-role" data-user-role>—</div>
+          <div class="user-name" data-user-name>Hostel Admin</div>
+          <div class="user-role" data-user-role>admin</div>
         </div>
       </div>
       <button id="logout-btn" class="btn btn-ghost btn-sm btn-block">🚪 Sign Out</button>
@@ -45,103 +72,222 @@
   <!-- TOPBAR -->
   <header class="topbar">
     <div>
-      <div class="topbar-title">Reports & Analytics</div>
-      <div class="topbar-subtitle">Filter and export waste data</div>
+      <div class="topbar-title">Waste & Emission Reports</div>
+      <div class="topbar-subtitle">Siddaganga Institute of Technology (SIT), Tumakuru</div>
     </div>
-    <div class="topbar-right">
-      <button id="export-csv-btn" class="btn btn-secondary btn-sm">⬇️ Export CSV</button>
+    <div class="topbar-right" id="export-buttons" style="display:flex;gap:var(--space-2)">
+      <button id="export-csv-btn" class="btn btn-secondary btn-sm" title="Export as Comma Separated Values">⬇️ Export CSV</button>
+      <button id="export-excel-btn" class="btn btn-secondary btn-sm" title="Export as Microsoft Excel">📊 Export Excel</button>
+      <button id="export-pdf-btn" class="btn btn-primary btn-sm" title="Print or Save as PDF">🖨️ Export PDF</button>
     </div>
   </header>
 
   <!-- MAIN CONTENT -->
   <main class="main-content page-content">
+    <!-- Printable Institutional Header -->
+    <div class="print-header">
+      <h1>Siddaganga Institute of Technology (SIT)</h1>
+      <p><strong>SIT Hostel Food Waste & Carbon Emission Monitoring System</strong> — Tumakuru, Karnataka</p>
+      <p id="print-meta" style="font-size:9pt;margin-top:4px"></p>
+    </div>
+
     <div class="page-header">
-      <h1>Waste Reports</h1>
-      <p>Explore detailed waste data filtered by day, month, or food item.</p>
+      <h1>Waste & Carbon Reports</h1>
+      <p>Analyze food utilization, audit waste discrepancies, and monitor carbon reduction across all 6 SIT residential hostel blocks.</p>
     </div>
 
     <!-- Tab Navigation -->
     <div class="tabs">
       <button class="tab-btn active" data-tab="daily">📅 Daily</button>
+      <button class="tab-btn" data-tab="weekly">🗓️ Weekly</button>
       <button class="tab-btn" data-tab="monthly">📆 Monthly</button>
+      <button class="tab-btn" data-tab="semester">🎓 Semester</button>
+      <button class="tab-btn" data-tab="hostel-wise">🏢 Hostel-Wise</button>
+      <button class="tab-btn" data-tab="meal-wise">🍽️ Meal-Wise</button>
       <button class="tab-btn" data-tab="food-stats">🥘 By Food Item</button>
     </div>
 
     <!-- Filter Panels -->
-    <div class="card" style="margin-bottom:var(--space-5)">
-      <!-- Daily Filters -->
-      <div data-tab-panel="daily" style="display:flex;align-items:flex-end;gap:var(--space-4)">
-        <div class="form-group" style="margin:0">
-          <label class="form-label">Select Date</label>
-          <input type="date" id="report-date" class="form-control">
+    <div class="card filter-container" style="margin-bottom:var(--space-5)">
+      <!-- Common Hostel Selector for tabs that support it -->
+      <div style="display:flex;gap:var(--space-4);flex-wrap:wrap;align-items:flex-end">
+        
+        <!-- Daily Filters -->
+        <div data-tab-panel="daily" class="report-filter-row" style="flex:1">
+          <div class="form-group" style="margin:0;min-width:180px">
+            <label class="form-label">SIT Hostel Block</label>
+            <select id="daily-hostel" class="form-control hostel-select">
+              <option value="all">All SIT Hostels</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0;min-width:160px">
+            <label class="form-label">Select Date</label>
+            <input type="date" id="daily-date" class="form-control">
+          </div>
+          <button class="btn btn-secondary" onclick="loadDailyReport()">🔍 View Daily</button>
         </div>
-        <button class="btn btn-secondary" onclick="loadDailyReport()">🔍 View Report</button>
-      </div>
 
-      <!-- Monthly Filters -->
-      <div data-tab-panel="monthly" style="display:none;align-items:flex-end;gap:var(--space-4)">
-        <div class="form-group" style="margin:0">
-          <label class="form-label">Year</label>
-          <select id="report-year" class="form-control" style="width:100px">
-            <option>2024</option>
-            <option>2025</option>
-            <option>2026</option>
-          </select>
+        <!-- Weekly Filters -->
+        <div data-tab-panel="weekly" class="report-filter-row" style="display:none;flex:1">
+          <div class="form-group" style="margin:0;min-width:180px">
+            <label class="form-label">SIT Hostel Block</label>
+            <select id="weekly-hostel" class="form-control hostel-select">
+              <option value="all">All SIT Hostels</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0;min-width:150px">
+            <label class="form-label">Start Date</label>
+            <input type="date" id="weekly-start" class="form-control">
+          </div>
+          <div class="form-group" style="margin:0;min-width:150px">
+            <label class="form-label">End Date</label>
+            <input type="date" id="weekly-end" class="form-control">
+          </div>
+          <button class="btn btn-secondary" onclick="loadWeeklyReport()">🔍 View Weekly</button>
         </div>
-        <div class="form-group" style="margin:0">
-          <label class="form-label">Month</label>
-          <select id="report-month" class="form-control" style="width:140px">
-            <option value="1">January</option>
-            <option value="2">February</option>
-            <option value="3">March</option>
-            <option value="4">April</option>
-            <option value="5">May</option>
-            <option value="6">June</option>
-            <option value="7">July</option>
-            <option value="8">August</option>
-            <option value="9">September</option>
-            <option value="10">October</option>
-            <option value="11">November</option>
-            <option value="12">December</option>
-          </select>
-        </div>
-        <button class="btn btn-secondary" onclick="loadMonthlyReport()">🔍 View Report</button>
-      </div>
 
-      <!-- Food Stats (no filter, loads all-time) -->
-      <div data-tab-panel="food-stats" style="display:none">
-        <p style="color:var(--txt-secondary);font-size:var(--text-sm)">
-          Showing all-time statistics for each food item.
-        </p>
+        <!-- Monthly Filters -->
+        <div data-tab-panel="monthly" class="report-filter-row" style="display:none;flex:1">
+          <div class="form-group" style="margin:0;min-width:180px">
+            <label class="form-label">SIT Hostel Block</label>
+            <select id="monthly-hostel" class="form-control hostel-select">
+              <option value="all">All SIT Hostels</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0;width:110px">
+            <label class="form-label">Year</label>
+            <select id="monthly-year" class="form-control">
+              <option>2024</option>
+              <option>2025</option>
+              <option selected>2026</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0;width:140px">
+            <label class="form-label">Month</label>
+            <select id="monthly-month" class="form-control">
+              <option value="1">January</option>
+              <option value="2">February</option>
+              <option value="3">March</option>
+              <option value="4">April</option>
+              <option value="5">May</option>
+              <option value="6">June</option>
+              <option value="7">July</option>
+              <option value="8">August</option>
+              <option value="9">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
+          </div>
+          <button class="btn btn-secondary" onclick="loadMonthlyReport()">🔍 View Monthly</button>
+        </div>
+
+        <!-- Semester Filters -->
+        <div data-tab-panel="semester" class="report-filter-row" style="display:none;flex:1">
+          <div class="form-group" style="margin:0;min-width:180px">
+            <label class="form-label">SIT Hostel Block</label>
+            <select id="semester-hostel" class="form-control hostel-select">
+              <option value="all">All SIT Hostels</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0;width:150px">
+            <label class="form-label">Academic Year</label>
+            <select id="semester-ay" class="form-control">
+              <option value="2025-2026" selected>2025–2026</option>
+              <option value="2024-2025">2024–2025</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0;width:180px">
+            <label class="form-label">Semester Term</label>
+            <select id="semester-term" class="form-control">
+              <option value="odd">Odd Sem (Aug–Dec)</option>
+              <option value="even">Even Sem (Jan–Jun)</option>
+            </select>
+          </div>
+          <button class="btn btn-secondary" onclick="loadSemesterReport()">🔍 View Semester</button>
+        </div>
+
+        <!-- Hostel-Wise Comparison Filters -->
+        <div data-tab-panel="hostel-wise" class="report-filter-row" style="display:none;flex:1">
+          <div class="form-group" style="margin:0;min-width:150px">
+            <label class="form-label">From Date</label>
+            <input type="date" id="hostelwise-start" class="form-control">
+          </div>
+          <div class="form-group" style="margin:0;min-width:150px">
+            <label class="form-label">To Date</label>
+            <input type="date" id="hostelwise-end" class="form-control">
+          </div>
+          <button class="btn btn-secondary" onclick="loadHostelWiseReport()">🔍 Compare Hostels</button>
+        </div>
+
+        <!-- Meal-Wise Breakdown Filters -->
+        <div data-tab-panel="meal-wise" class="report-filter-row" style="display:none;flex:1">
+          <div class="form-group" style="margin:0;min-width:180px">
+            <label class="form-label">SIT Hostel Block</label>
+            <select id="mealwise-hostel" class="form-control hostel-select">
+              <option value="all">All SIT Hostels</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0;min-width:150px">
+            <label class="form-label">From Date</label>
+            <input type="date" id="mealwise-start" class="form-control">
+          </div>
+          <div class="form-group" style="margin:0;min-width:150px">
+            <label class="form-label">To Date</label>
+            <input type="date" id="mealwise-end" class="form-control">
+          </div>
+          <button class="btn btn-secondary" onclick="loadMealWiseReport()">🔍 View Meals</button>
+        </div>
+
+        <!-- Food Stats Filters -->
+        <div data-tab-panel="food-stats" class="report-filter-row" style="display:none;flex:1">
+          <div class="form-group" style="margin:0;min-width:150px">
+            <label class="form-label">From Date</label>
+            <input type="date" id="foodstats-start" class="form-control">
+          </div>
+          <div class="form-group" style="margin:0;min-width:150px">
+            <label class="form-label">To Date</label>
+            <input type="date" id="foodstats-end" class="form-control">
+          </div>
+          <button class="btn btn-secondary" onclick="loadFoodStats()">🔍 Filter Items</button>
+        </div>
+
       </div>
     </div>
 
-    <!-- Totals Summary -->
-    <div class="grid-2" style="margin-bottom:var(--space-5)">
+    <!-- Totals Summary Cards (4 Cards) -->
+    <div class="report-stat-grid">
+      <div class="stat-card blue">
+        <div class="stat-icon">🍲</div>
+        <div class="stat-value" id="total-prepared">—</div>
+        <div class="stat-label">Total Prepared Food</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🍽️</div>
+        <div class="stat-value" id="total-served">—</div>
+        <div class="stat-label">Total Served Food</div>
+      </div>
       <div class="stat-card green">
         <div class="stat-icon">🗑️</div>
         <div class="stat-value" id="total-waste">—</div>
-        <div class="stat-label">Total Waste (selected period)</div>
+        <div class="stat-label">Total Food Waste</div>
       </div>
       <div class="stat-card amber">
         <div class="stat-icon">🌿</div>
         <div class="stat-value" id="total-co2">—</div>
-        <div class="stat-label">Total CO₂ Emitted</div>
+        <div class="stat-label">Total CO₂e Emissions</div>
       </div>
     </div>
 
     <!-- Data Table -->
     <div class="card">
       <div class="table-wrapper">
-        <table class="data-table">
+        <table class="data-table" id="report-table">
           <thead id="report-thead">
-            <tr>
-              <th>Date</th><th>Meal</th><th>Food Item</th><th>Category</th>
-              <th>Qty Planned</th><th>Qty Wasted</th><th>Waste %</th><th>CO₂ Emitted</th>
-            </tr>
+            <!-- Dynamic Headers -->
           </thead>
           <tbody id="report-tbody">
-            <!-- Populated by JS -->
+            <!-- Dynamic Rows -->
           </tbody>
         </table>
       </div>

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Menus — Food Waste Tracker</title>
-  <meta name="description" content="View and manage daily hostel mess menus.">
+  <title>Daily Menus — SIT Hostel Food Waste Tracker</title>
+  <meta name="description" content="Manage daily planned hostel mess menus for Siddaganga Institute of Technology, Tumakuru.">
 
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/reset.css">
@@ -17,7 +17,7 @@
   <nav class="sidebar">
     <div class="sidebar-logo">
       <div class="logo-icon">🍽️</div>
-      <div class="logo-text">Food Waste<span>Tracker</span></div>
+      <div class="logo-text">SIT Hostel<span>Tracker</span></div>
     </div>
     <div class="sidebar-nav">
       <div class="nav-section-label">Main</div>
@@ -34,8 +34,8 @@
       <div class="user-info">
         <div class="user-avatar" data-user-avatar>A</div>
         <div class="user-meta">
-          <div class="user-name" data-user-name>Loading...</div>
-          <div class="user-role" data-user-role>—</div>
+          <div class="user-name" data-user-name>Hostel Admin</div>
+          <div class="user-role" data-user-role>admin</div>
         </div>
       </div>
       <button id="logout-btn" class="btn btn-ghost btn-sm btn-block">🚪 Sign Out</button>
@@ -45,8 +45,8 @@
   <!-- TOPBAR -->
   <header class="topbar">
     <div>
-      <div class="topbar-title">Daily Menus</div>
-      <div class="topbar-subtitle">Manage what's cooked each meal</div>
+      <div class="topbar-title">Daily Mess Menus</div>
+      <div class="topbar-subtitle">Siddaganga Institute of Technology (SIT), Tumakuru</div>
     </div>
     <div class="topbar-right">
       <button id="create-menu-btn" class="btn btn-primary btn-sm" onclick="openModal('create-menu-modal')">
@@ -58,22 +58,29 @@
   <!-- MAIN CONTENT -->
   <main class="main-content page-content">
     <div class="page-header">
-      <h1>Mess Menus</h1>
-      <p>Create daily menus and add food items to track what was planned to be cooked.</p>
+      <h1>Daily Mess Menus</h1>
+      <p>Configure planned meal menus and food item portions across SIT residential hostel blocks.</p>
     </div>
 
     <!-- Filters -->
-    <div class="filter-bar card" style="padding:var(--space-4)">
-      <div class="form-group" style="margin:0;flex:1;max-width:200px">
+    <div class="filter-bar card" style="padding:var(--space-4);display:flex;gap:var(--space-3);flex-wrap:wrap">
+      <div class="form-group" style="margin:0;flex:1;min-width:180px">
+        <label class="form-label">Filter by Hostel</label>
+        <select id="filter-hostel" class="form-control">
+          <option value="all">All SIT Hostels</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0;flex:1;min-width:160px">
         <label class="form-label">Filter by Date</label>
         <input type="date" id="filter-date" class="form-control">
       </div>
-      <div class="form-group" style="margin:0;flex:1;max-width:200px">
+      <div class="form-group" style="margin:0;flex:1;min-width:140px">
         <label class="form-label">Filter by Meal</label>
         <select id="filter-meal" class="form-control">
           <option value="">All Meals</option>
           <option value="breakfast">🌅 Breakfast</option>
           <option value="lunch">☀️ Lunch</option>
+          <option value="evening_snacks">☕ Evening Snacks</option>
           <option value="dinner">🌙 Dinner</option>
         </select>
       </div>
@@ -89,15 +96,14 @@
           <thead>
             <tr>
               <th>Date</th>
+              <th>Hostel Block</th>
               <th>Meal Type</th>
+              <th>Planned Items</th>
               <th>Created By</th>
-              <th>Created At</th>
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody id="menus-tbody">
-            <!-- Populated by JS -->
-          </tbody>
+          <tbody id="menus-tbody"></tbody>
         </table>
       </div>
       <div id="menus-empty" class="empty-state" style="display:none">
@@ -109,29 +115,36 @@
     </div>
   </main>
 
-  <!-- ── Create Menu Modal ───────────────────────────────── -->
+  <!-- Create Menu Modal -->
   <div class="modal-overlay" id="create-menu-modal">
-    <div class="modal">
+    <div class="modal" style="max-width:540px">
       <div class="modal-header">
-        <h2 class="modal-title">Create New Menu</h2>
+        <h2 class="modal-title">Create New Daily Menu</h2>
         <button class="modal-close" onclick="closeModal('create-menu-modal')">✕</button>
       </div>
       <form id="create-menu-form">
+        <div class="form-group">
+          <label class="form-label" for="new-menu-hostel">Hostel (SIT) *</label>
+          <select id="new-menu-hostel" class="form-control" required>
+            <option value="">Select Hostel...</option>
+          </select>
+        </div>
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label" for="new-menu-date">Date</label>
+            <label class="form-label" for="new-menu-date">Date *</label>
             <input type="date" id="new-menu-date" class="form-control" required>
           </div>
           <div class="form-group">
-            <label class="form-label" for="new-menu-meal">Meal Type</label>
+            <label class="form-label" for="new-menu-meal">Meal Type *</label>
             <select id="new-menu-meal" class="form-control" required>
               <option value="breakfast">🌅 Breakfast</option>
-              <option value="lunch">☀️ Lunch</option>
+              <option value="lunch" selected>☀️ Lunch</option>
+              <option value="evening_snacks">☕ Evening Snacks</option>
               <option value="dinner">🌙 Dinner</option>
             </select>
           </div>
         </div>
-        <p class="form-hint">After creating the menu, you'll be able to add food items to it.</p>
+        <p class="form-hint">After creating the menu, you can add multiple food items and planned quantities to it.</p>
         <div style="display:flex;gap:var(--space-3);margin-top:var(--space-4)">
           <button type="submit" class="btn btn-primary" style="flex:1">✅ Create Menu</button>
           <button type="button" class="btn btn-secondary" onclick="closeModal('create-menu-modal')">Cancel</button>
@@ -140,34 +153,36 @@
     </div>
   </div>
 
-  <!-- ── Menu Detail Modal ───────────────────────────────── -->
+  <!-- Menu Detail Modal -->
   <div class="modal-overlay" id="detail-modal">
-    <div class="modal" style="max-width:640px">
+    <div class="modal" style="max-width:660px">
       <div class="modal-header">
         <h2 class="modal-title" id="detail-title">Menu Details</h2>
         <button class="modal-close" onclick="closeModal('detail-modal')">✕</button>
       </div>
 
       <div id="detail-items">
-        <!-- Items table injected by JS -->
+        <!-- Injected via JS -->
       </div>
 
-      <!-- Add Item Section (managers/admins only) -->
-      <div id="add-item-section" style="margin-top:var(--space-6)">
+      <!-- Add Item to Menu Form -->
+      <div id="add-item-section" style="margin-top:var(--space-5)">
         <div class="divider"></div>
-        <h3 style="font-size:var(--text-base);font-weight:700;margin-bottom:var(--space-4)">➕ Add Food Item</h3>
+        <h3 style="font-size:var(--text-base);font-weight:700;margin-bottom:var(--space-3);color:var(--clr-primary-light)">
+          ➕ Add Food Item to This Menu
+        </h3>
         <form id="add-item-form">
           <input type="hidden" id="add-item-menu-id">
           <div class="form-row">
-            <div class="form-group">
+            <div class="form-group" style="flex:2">
               <label class="form-label" for="add-item-food">Food Item</label>
               <select id="add-item-food" class="form-control" required>
                 <option value="">Select item...</option>
               </select>
             </div>
-            <div class="form-group">
-              <label class="form-label" for="add-item-qty">Planned Quantity</label>
-              <input type="number" id="add-item-qty" class="form-control" min="0.01" step="0.01" placeholder="e.g. 20" required>
+            <div class="form-group" style="flex:1">
+              <label class="form-label" for="add-item-qty">Planned Qty</label>
+              <input type="number" id="add-item-qty" class="form-control" min="0.01" step="0.01" placeholder="e.g. 50" required>
             </div>
           </div>
           <button type="submit" class="btn btn-primary btn-sm">➕ Add Item</button>

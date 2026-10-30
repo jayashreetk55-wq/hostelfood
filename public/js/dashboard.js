@@ -32,7 +32,7 @@ function destroyChart(id) {
   }
 }
 
-// ── Render 6 Summary Cards ────────────────────────────────
+// ── Render Summary Cards & Mess Flow Strip ───────────────
 function renderSummary(summary) {
   const {
     total_waste_kg = 0,
@@ -40,23 +40,35 @@ function renderSummary(summary) {
     meals_logged = 0,
     weekly_reduction_pct = 0,
     total_prepared_kg = 0,
+    total_served_kg = 0,
+    total_leftover_kg = 0,
+    total_discarded_kg = 0,
     total_waste_month_kg = 0,
+    total_co2_month_kg = 0,
     carbon_context
   } = summary;
 
-  const elWaste   = document.getElementById('stat-waste');
-  const elCo2     = document.getElementById('stat-co2');
-  const elMeals   = document.getElementById('stat-meals');
-  const elReduc   = document.getElementById('stat-reduction');
-  const elPrep    = document.getElementById('stat-prepared');
-  const elMonth   = document.getElementById('stat-monthly-waste');
+  const elWaste    = document.getElementById('stat-waste');
+  const elCo2      = document.getElementById('stat-co2');
+  const elMeals    = document.getElementById('stat-meals');
+  const elReduc    = document.getElementById('stat-reduction');
+  const elPrep     = document.getElementById('stat-prepared');
+  const elServ     = document.getElementById('stat-served');
+  const elLeft     = document.getElementById('stat-leftover');
+  const elDisc     = document.getElementById('stat-discarded');
+  const elMonth    = document.getElementById('stat-monthly-waste');
+  const elMonthCo2 = document.getElementById('stat-monthly-co2');
 
-  if (elWaste) utils.animateCount(elWaste, total_waste_kg, 2);
-  if (elCo2)   utils.animateCount(elCo2, total_co2_kg, 3);
-  if (elMeals) utils.animateCount(elMeals, meals_logged, 0);
-  if (elReduc) utils.animateCount(elReduc, Math.abs(weekly_reduction_pct), 1);
-  if (elPrep)  utils.animateCount(elPrep, total_prepared_kg, 2);
-  if (elMonth) utils.animateCount(elMonth, total_waste_month_kg, 2);
+  if (elWaste)    utils.animateCount(elWaste, total_waste_kg, 2);
+  if (elCo2)      utils.animateCount(elCo2, total_co2_kg, 3);
+  if (elMeals)    utils.animateCount(elMeals, meals_logged, 0);
+  if (elReduc)    utils.animateCount(elReduc, Math.abs(weekly_reduction_pct), 1);
+  if (elPrep)     utils.animateCount(elPrep, total_prepared_kg, 2);
+  if (elServ)     utils.animateCount(elServ, total_served_kg, 2);
+  if (elLeft)     utils.animateCount(elLeft, total_leftover_kg, 2);
+  if (elDisc)     utils.animateCount(elDisc, total_discarded_kg, 2);
+  if (elMonth)    utils.animateCount(elMonth, total_waste_month_kg, 2);
+  if (elMonthCo2) utils.animateCount(elMonthCo2, total_co2_month_kg, 2);
 
   const reductionChange = document.getElementById('stat-reduction-change');
   if (reductionChange) {
@@ -145,7 +157,7 @@ function renderMealChart(data) {
   });
 }
 
-// ── Chart 3: Monthly Trends Bar Chart ─────────────────────
+// ── Chart 3: Monthly Trends (Waste & Carbon) ──────────────
 function renderMonthlyTrendsChart(data) {
   destroyChart('monthly');
   const ctx = document.getElementById('chart-monthly-trends');
@@ -158,23 +170,41 @@ function renderMonthlyTrendsChart(data) {
       labels,
       datasets: [
         {
+          type: 'bar',
           label: 'Prepared (kg)',
           data: data.map(d => parseFloat(d.total_prepared_kg.toFixed(1))),
           backgroundColor: CHART_COLORS.blue,
-          borderRadius: 6
+          borderRadius: 6,
+          order: 2
         },
         {
+          type: 'bar',
           label: 'Wasted (kg)',
           data: data.map(d => parseFloat(d.total_waste_kg.toFixed(1))),
           backgroundColor: CHART_COLORS.red,
-          borderRadius: 6
+          borderRadius: 6,
+          order: 3
+        },
+        {
+          type: 'line',
+          label: 'CO₂e Emissions (kg)',
+          data: data.map(d => parseFloat(d.total_co2_kg.toFixed(2))),
+          borderColor: CHART_COLORS.amberB,
+          backgroundColor: CHART_COLORS.amber,
+          tension: 0.35,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          order: 1
         }
       ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { legend: { position: 'top' } },
+      plugins: {
+        legend: { position: 'top' },
+        tooltip: { mode: 'index', intersect: false }
+      },
       scales: {
         x: { grid: { color: CHART_COLORS.grid } },
         y: { grid: { color: CHART_COLORS.grid }, beginAtZero: true }
@@ -183,7 +213,7 @@ function renderMonthlyTrendsChart(data) {
   });
 }
 
-// ── Chart 4: Hostel-Wise Comparison Bar Chart ─────────────
+// ── Chart 4: SIT Hostel-Wise Waste & Carbon Comparison ─────
 function renderHostelComparisonChart(data) {
   destroyChart('hostel');
   const ctx = document.getElementById('chart-hostel-comparison');
@@ -198,14 +228,13 @@ function renderHostelComparisonChart(data) {
         {
           label: 'Food Waste (kg)',
           data: data.map(d => parseFloat(d.total_waste_kg.toFixed(1))),
-          backgroundColor: [
-            CHART_COLORS.blue,
-            CHART_COLORS.green,
-            CHART_COLORS.amber,
-            CHART_COLORS.purple,
-            CHART_COLORS.teal,
-            CHART_COLORS.rose
-          ],
+          backgroundColor: CHART_COLORS.blue,
+          borderRadius: 6
+        },
+        {
+          label: 'Carbon Emissions (kg CO₂e)',
+          data: data.map(d => parseFloat(d.total_co2_kg.toFixed(2))),
+          backgroundColor: CHART_COLORS.amber,
           borderRadius: 6
         }
       ]
@@ -213,7 +242,10 @@ function renderHostelComparisonChart(data) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
+      plugins: {
+        legend: { position: 'top' },
+        tooltip: { mode: 'index', intersect: false }
+      },
       scales: {
         x: { grid: { color: CHART_COLORS.grid } },
         y: { grid: { color: CHART_COLORS.grid }, beginAtZero: true }

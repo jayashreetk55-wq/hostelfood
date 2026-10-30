@@ -111,6 +111,7 @@ async function saveCalculation(req, res, next) {
     res.status(201).json({
       message: 'Carbon footprint calculation saved to history.',
       record: saved,
+      calculation: saved,
       details: result
     });
   } catch (err) {

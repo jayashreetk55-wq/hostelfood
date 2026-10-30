@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <script>window.location.replace('/dashboard.html');</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign In — College Hostel Food Waste Tracker</title>
-  <meta name="description" content="Log in to track food waste and carbon emissions at your college hostel mess.">
+  <title>Sign In — SIT Hostel Food Waste & Carbon Emission Monitoring System</title>
+  <meta name="description" content="Sign in to Siddaganga Institute of Technology (SIT), Tumakuru — SIT Hostel Food Waste & Carbon Emission Monitoring System.">
 
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/reset.css">
@@ -42,6 +42,14 @@
       box-shadow: var(--shadow-glow);
       animation: float 4s ease-in-out infinite;
     }
+    .auth-institution {
+      font-size: var(--text-sm);
+      font-weight: 700;
+      color: var(--clr-primary-light);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: var(--space-2);
+    }
     .auth-brand-title {
       font-size: var(--text-3xl);
       font-weight: 800;
@@ -49,12 +57,19 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin-bottom: var(--space-3);
+      margin-bottom: var(--space-2);
+      line-height: 1.2;
+    }
+    .auth-location {
+      font-size: var(--text-sm);
+      color: var(--txt-secondary);
+      margin-bottom: var(--space-4);
+      font-weight: 500;
     }
     .auth-brand-desc {
       font-size: var(--text-base);
       color: var(--txt-secondary);
-      max-width: 360px;
+      max-width: 380px;
       line-height: 1.7;
     }
 
@@ -124,22 +139,24 @@
 
       <div class="auth-branding">
         <div class="auth-brand-icon">🍽️</div>
-        <h2 class="auth-brand-title">College Hostel<br>Food Waste Tracker</h2>
+        <div class="auth-institution">Siddaganga Institute of Technology (SIT)</div>
+        <h2 class="auth-brand-title">Hostel Food Waste &<br>Carbon Monitoring System</h2>
+        <div class="auth-location">Tumakuru, Karnataka</div>
         <p class="auth-brand-desc">
-          Monitor daily food waste, calculate carbon emissions, and build a greener campus — one meal at a time.
+          Audit daily food waste, calculate real-time carbon emissions, and streamline mess management across all six SIT residential hostel blocks.
         </p>
         <div class="auth-stats">
           <div class="auth-stat">
-            <div class="auth-stat-value">↓35%</div>
-            <div class="auth-stat-label">Avg. Waste<br>Reduction</div>
+            <div class="auth-stat-value">6</div>
+            <div class="auth-stat-label">SIT Hostel<br>Blocks</div>
           </div>
           <div class="auth-stat">
-            <div class="auth-stat-value">CO₂</div>
-            <div class="auth-stat-label">Emission<br>Tracking</div>
+            <div class="auth-stat-value">CO₂e</div>
+            <div class="auth-stat-label">Carbon<br>Tracking</div>
           </div>
           <div class="auth-stat">
-            <div class="auth-stat-value">7+</div>
-            <div class="auth-stat-label">Report<br>Types</div>
+            <div class="auth-stat-value">7</div>
+            <div class="auth-stat-label">Analytics<br>Reports</div>
           </div>
         </div>
       </div>
@@ -148,8 +165,8 @@
     <!-- RIGHT: Login Form -->
     <div class="auth-right">
       <div class="login-card">
-        <h1>Welcome back 👋</h1>
-        <p class="subtitle">Sign in to your hostel mess account</p>
+        <h1>Welcome Back 👋</h1>
+        <p class="subtitle">Siddaganga Institute of Technology (SIT), Tumakuru</p>
 
         <form id="login-form" novalidate>
           <div class="form-group">
@@ -185,12 +202,12 @@
 
         <!-- Demo credentials helper -->
         <div class="demo-creds">
-          <strong>🧪 Demo Credentials</strong>
+          <strong>🧪 SIT Hostel Demo Credentials</strong>
           <div>Password for all accounts: <code>password123</code></div>
           <div class="quick-login-btns">
             <button class="quick-btn" onclick="quickLogin('admin@hostel.edu')">👑 Admin</button>
-            <button class="quick-btn" onclick="quickLogin('manager@hostel.edu')">👨‍🍳 Manager</button>
-            <button class="quick-btn" onclick="quickLogin('student@hostel.edu')">🎓 Viewer</button>
+            <button class="quick-btn" onclick="quickLogin('manager@hostel.edu')">👨‍🍳 Mess Manager</button>
+            <button class="quick-btn" onclick="quickLogin('student@hostel.edu')">🎓 Student Viewer</button>
           </div>
         </div>
       </div>
