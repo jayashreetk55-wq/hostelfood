@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carbon Footprint Calculator — SIT Hostel Food Waste Tracker</title>
+  <meta name="description" content="Calculate food waste carbon footprint with documented emission factors and unit conversions for SIT hostels.">
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/animations.css">
+
+  <style>
+    .calc-layout {
+      display: grid;
+      grid-template-columns: 460px 1fr;
+      gap: var(--space-6);
+      align-items: start;
+    }
+    @media (max-width: 1100px) {
+      .calc-layout { grid-template-columns: 1fr; }
+    }
+
+    .result-hero {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(34, 197, 94, 0.12));
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      text-align: center;
+      margin-top: var(--space-4);
+    }
+    .result-hero .number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--clr-accent-light);
+      line-height: 1.1;
+      margin: var(--space-2) 0;
+    }
+    .result-formula {
+      font-family: monospace;
+      font-size: var(--text-xs);
+      background: rgba(0, 0, 0, 0.25);
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-sm);
+      display: inline-block;
+      margin-top: var(--space-2);
+      color: #93c5fd;
+    }
+
+    .equivalents-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-3);
+      margin-top: var(--space-4);
+    }
+    .eq-card {
+      background: var(--bg-card-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-3);
+      text-align: center;
+    }
+    .eq-card .icon { font-size: 1.5rem; margin-bottom: 2px; }
+    .eq-card .val { font-weight: 700; font-size: var(--text-sm); color: var(--txt-primary); }
+    .eq-card .lbl { font-size: 10px; color: var(--txt-secondary); }
+
+    .source-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      color: #60a5fa;
+      margin-top: var(--space-1);
+    }
+  </style>
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🍽️</div>
+      <div class="logo-text">SIT Hostel<span>Tracker</span></div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+      <a href="waste-entry.html" class="nav-item"><span class="nav-icon">📝</span> Add Food Record</a>
+      <a href="calculator.html" class="nav-item active"><span class="nav-icon">🌱</span> Carbon Calculator</a>
+      <a href="menu.html" class="nav-item"><span class="nav-icon">📋</span> Menus</a>
+      <div class="nav-section-label">Analytics</div>
+      <a href="reports.html" class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+      <div class="nav-section-label">System</div>
+      <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" data-user-avatar>A</div>
+        <div class="user-meta">
+          <div class="user-name" data-user-name>Hostel Admin</div>
+          <div class="user-role" data-user-role>admin</div>
+        </div>
+      </div>
+      <button id="logout-btn" class="btn btn-ghost btn-sm btn-block">🚪 Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div>
+      <div class="topbar-title">Carbon Footprint Calculator</div>
+      <div class="topbar-subtitle">Real-time CO₂e modeling using verified IPCC / FAO emission factors</div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content page-content">
+    <div class="page-header">
+      <h1>Food Waste Carbon Footprint Calculator</h1>
+      <p>Calculate emissions based on exact food items, portion conversions (pieces, litres, grams, kg), and documented factors.</p>
+    </div>
+
+    <div class="calc-layout">
+      <!-- LEFT: Calculator Form -->
+      <div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🧮 Compute Carbon Footprint</div>
+          </div>
+
+          <form id="calc-form" novalidate>
+            <!-- Hostel & Date -->
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="calc-hostel">Hostel (SIT) *</label>
+                <select id="calc-hostel" class="form-control" required>
+                  <option value="">Select Hostel...</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="calc-date">Date *</label>
+                <input type="date" id="calc-date" class="form-control" required>
+              </div>
+            </div>
+
+            <!-- Meal -->
+            <div class="form-group">
+              <label class="form-label" for="calc-meal">Meal *</label>
+              <select id="calc-meal" class="form-control" required>
+                <option value="breakfast">🌅 Breakfast</option>
+                <option value="lunch" selected>☀️ Lunch</option>
+                <option value="evening_snacks">☕ Evening Snacks</option>
+                <option value="dinner">🌙 Dinner</option>
+              </select>
+            </div>
+
+            <!-- Food Item Selector -->
+            <div class="form-group">
+              <label class="form-label" for="calc-food">Food Item *</label>
+              <select id="calc-food" class="form-control" required>
+                <option value="">Choose Food Item...</option>
+              </select>
+              <div id="factor-details-tag" class="source-tag" style="display:none">
+                <span id="tag-factor-text">Emission Factor: —</span>
+              </div>
+            </div>
+
+            <!-- Quantity & Unit -->
+            <div class="form-row">
+              <div class="form-group" style="flex:2">
+                <label class="form-label" for="calc-qty">Wasted Quantity *</label>
+                <input type="number" id="calc-qty" class="form-control" min="0" step="0.01" placeholder="e.g. 5" required>
+              </div>
+              <div class="form-group" style="flex:1">
+                <label class="form-label" for="calc-unit">Unit *</label>
+                <select id="calc-unit" class="form-control" required>
+                  <option value="kg">kg</option>
+                  <option value="g">grams (g)</option>
+                  <option value="litres">litres (L)</option>
+                  <option value="ml">ml</option>
+                  <option value="pieces">pieces (pcs)</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg" id="btn-run-calc" style="margin-top:var(--space-3)">
+              ⚡ Calculate Carbon Footprint
+            </button>
+          </form>
+
+          <!-- Result Box -->
+          <div id="calc-result-box" style="display:none">
+            <div class="result-hero">
+              <div style="font-size:var(--text-xs);text-transform:uppercase;letter-spacing:0.05em;color:var(--txt-secondary)">
+                Estimated Greenhouse Gas Impact
+              </div>
+              <div class="number" id="res-co2">0.000 kg CO₂e</div>
+              <div class="result-formula" id="res-formula">—</div>
+              <div style="margin-top:var(--space-2);font-size:var(--text-xs);color:var(--txt-secondary)" id="res-steps">
+                Conversion: —
+              </div>
+
+              <!-- Equivalents -->
+              <div class="equivalents-grid">
+                <div class="eq-card">
+                  <div class="icon">🚗</div>
+                  <div class="val" id="eq-car">0 km</div>
+                  <div class="lbl">Car Driving Equivalent</div>
+                </div>
+                <div class="eq-card">
+                  <div class="icon">📱</div>
+                  <div class="val" id="eq-phones">0</div>
+                  <div class="lbl">Smartphones Charged</div>
+                </div>
+                <div class="eq-card">
+                  <div class="icon">🌳</div>
+                  <div class="val" id="eq-tree">0 days</div>
+                  <div class="lbl">Tree Absorption Days</div>
+                </div>
+              </div>
+
+              <button type="button" class="btn btn-secondary btn-block" id="btn-save-calc" style="margin-top:var(--space-4)">
+                📌 Save Calculation to History
+              </button>
+            </div>
+          </div>
+
+          <!-- Calculation Unavailable Alert -->
+          <div id="calc-unavailable-box" class="co2-banner high" style="display:none;margin-top:var(--space-4)">
+            <span>⚠️</span>
+            <span id="unavailable-reason">Calculation unavailable.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Calculation History -->
+      <div>
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">📜 Calculation History</div>
+              <div class="card-subtitle">Stored calculations by hostel, date and meal</div>
+            </div>
+            <div id="history-total-co2" style="font-weight:700;color:var(--clr-accent-light);font-size:var(--text-sm)">
+              Total: 0.000 kg CO₂e
+            </div>
+          </div>
+
+          <!-- History Filter Bar -->
+          <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;margin-bottom:var(--space-3)">
+            <select id="hist-filter-hostel" class="form-control" style="width:auto;flex:1">
+              <option value="all">All Hostels</option>
+            </select>
+            <select id="hist-filter-meal" class="form-control" style="width:auto;flex:1">
+              <option value="all">All Meals</option>
+              <option value="breakfast">Breakfast</option>
+              <option value="lunch">Lunch</option>
+              <option value="evening_snacks">Snacks</option>
+              <option value="dinner">Dinner</option>
+            </select>
+            <input type="date" id="hist-filter-date" class="form-control" style="width:auto;flex:1">
+            <button class="btn btn-secondary btn-sm" id="btn-reset-hist-filter">Reset</button>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date & Meal</th>
+                  <th>Hostel</th>
+                  <th>Food Item</th>
+                  <th>Wasted</th>
+                  <th>Net CO₂e</th>
+                  <th>Source</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="hist-tbody"></tbody>
+            </table>
+          </div>
+          <div id="hist-empty" class="empty-state" style="display:none">
+            <div class="empty-icon">🌱</div>
+            <p>No calculation history records found.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast-container"></div>
+
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/calculator.js"></script>
+</body>
+</html>

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard — Food Waste Tracker</title>
-  <meta name="description" content="Real-time dashboard showing food waste statistics and carbon emissions for college hostel.">
+  <title>Dashboard — SIT Hostel Food Waste & Carbon Tracker</title>
+  <meta name="description" content="Real-time dashboard showing food waste statistics, 7 interactive charts, and carbon emissions for SIT hostels.">
 
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/reset.css">
@@ -18,18 +18,21 @@
   <nav class="sidebar">
     <div class="sidebar-logo">
       <div class="logo-icon">🍽️</div>
-      <div class="logo-text">Food Waste<span>Tracker</span></div>
+      <div class="logo-text">SIT Hostel<span>Tracker</span></div>
     </div>
     <div class="sidebar-nav">
       <div class="nav-section-label">Main</div>
       <a href="dashboard.html" class="nav-item active" id="nav-dashboard">
         <span class="nav-icon">📊</span> Dashboard
       </a>
+      <a href="waste-entry.html" class="nav-item" id="nav-waste">
+        <span class="nav-icon">📝</span> Add Food Record
+      </a>
+      <a href="calculator.html" class="nav-item" id="nav-calculator">
+        <span class="nav-icon">🌱</span> Carbon Calculator
+      </a>
       <a href="menu.html" class="nav-item" id="nav-menu">
         <span class="nav-icon">📋</span> Menus
-      </a>
-      <a href="waste-entry.html" class="nav-item" id="nav-waste">
-        <span class="nav-icon">♻️</span> Log Waste
       </a>
       <div class="nav-section-label">Analytics</div>
       <a href="reports.html" class="nav-item" id="nav-reports">
@@ -44,8 +47,8 @@
       <div class="user-info">
         <div class="user-avatar" data-user-avatar>A</div>
         <div class="user-meta">
-          <div class="user-name" data-user-name>Loading...</div>
-          <div class="user-role" data-user-role>—</div>
+          <div class="user-name" data-user-name>Hostel Admin</div>
+          <div class="user-role" data-user-role>admin</div>
         </div>
       </div>
       <button id="logout-btn" class="btn btn-ghost btn-sm btn-block">🚪 Sign Out</button>
@@ -55,19 +58,29 @@
   <!-- TOPBAR -->
   <header class="topbar">
     <div>
-      <div class="topbar-title">Dashboard</div>
+      <div class="topbar-title">Dashboard Overview</div>
       <div class="topbar-subtitle" id="topbar-date">—</div>
     </div>
-    <div class="topbar-right">
-      <a href="waste-entry.html" class="btn btn-primary btn-sm">+ Log Waste</a>
+    <div class="topbar-right" style="display:flex;align-items:center;gap:var(--space-3)">
+      <!-- SIT Hostel Selector Filter -->
+      <div style="display:flex;align-items:center;gap:var(--space-2)">
+        <label for="dashboard-hostel-filter" style="font-size:var(--text-xs);color:var(--txt-secondary);font-weight:600">HOSTEL:</label>
+        <select id="dashboard-hostel-filter" class="form-control" style="width:230px;font-size:var(--text-xs);padding:6px 10px">
+          <option value="all">🏢 All SIT Hostels</option>
+        </select>
+      </div>
+      <a href="waste-entry.html" class="btn btn-primary btn-sm">+ Add Food Record</a>
     </div>
   </header>
 
   <!-- MAIN CONTENT -->
   <main class="main-content page-content">
-    <div class="page-header">
-      <h1>Food Waste Overview</h1>
-      <p>Today's snapshot — waste logged, carbon emissions, and trends at a glance.</p>
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--space-3)">
+      <div>
+        <h1>SIT Hostel Food Waste & Carbon Emissions</h1>
+        <p>Live analytics across 6 SIT residential blocks with IPCC / FAO carbon modeling.</p>
+      </div>
+      <button id="btn-refresh-dashboard" class="btn btn-ghost btn-sm">🔄 Refresh Data</button>
     </div>
 
     <!-- Carbon Context Banner -->
@@ -75,39 +88,60 @@
       <span>🟢</span><span>Loading carbon footprint context...</span>
     </div>
 
-    <!-- Stat Cards -->
-    <div class="stats-grid stagger-children">
+    <!-- 6 Stat Cards -->
+    <div class="stats-grid stagger-children" style="grid-template-columns: repeat(auto-fit, minmax(210px, 1fr))">
+      <!-- 1. Food Wasted Today -->
       <div class="stat-card green hover-lift">
         <div class="stat-icon">🗑️</div>
         <div class="stat-value" id="stat-waste">0.00</div>
         <div class="stat-label">kg Wasted Today</div>
       </div>
+
+      <!-- 2. CO2e Emissions Today -->
       <div class="stat-card amber hover-lift">
         <div class="stat-icon">🌿</div>
         <div class="stat-value" id="stat-co2">0.000</div>
-        <div class="stat-label">kg CO₂ Emitted Today</div>
+        <div class="stat-label">kg CO₂e Emitted Today</div>
       </div>
+
+      <!-- 3. Meals Logged Today -->
       <div class="stat-card blue hover-lift">
         <div class="stat-icon">🍽️</div>
         <div class="stat-value" id="stat-meals">0</div>
         <div class="stat-label">Meals Logged Today</div>
       </div>
+
+      <!-- 4. Weekly Waste Change -->
       <div class="stat-card green hover-lift">
         <div class="stat-icon">📉</div>
-        <div class="stat-value" id="stat-reduction">0.0</div>
+        <div class="stat-value" id="stat-reduction">0.0%</div>
         <div class="stat-label">% Weekly Change</div>
         <div class="stat-change" id="stat-reduction-change">vs. last week</div>
       </div>
+
+      <!-- 5. Food Prepared Today -->
+      <div class="stat-card blue hover-lift">
+        <div class="stat-icon">🍲</div>
+        <div class="stat-value" id="stat-prepared">0.00</div>
+        <div class="stat-label">kg Prepared Today</div>
+      </div>
+
+      <!-- 6. Monthly Food Waste -->
+      <div class="stat-card amber hover-lift">
+        <div class="stat-icon">📅</div>
+        <div class="stat-value" id="stat-monthly-waste">0.00</div>
+        <div class="stat-label">kg Monthly Food Waste</div>
+      </div>
     </div>
 
-    <!-- Main Charts Grid -->
-    <div class="charts-grid">
-      <!-- Weekly Bar Chart -->
+    <!-- Charts Row 1: Weekly (Chart 1) & Meal Distribution (Chart 2) -->
+    <div class="charts-grid" style="margin-top:var(--space-6)">
+      <!-- Chart 1: Weekly Waste & CO2 -->
       <div class="chart-card card hover-lift">
         <div class="card-header">
           <div>
-            <div class="card-title">Weekly Waste & CO₂</div>
-            <div class="card-subtitle">Last 7 days — kg wasted vs. CO₂ emitted</div>
+            <div class="card-title">1. Weekly Food Waste & CO₂e</div>
+            <div class="card-subtitle">Last 7 days — kg wasted vs. kg CO₂e emitted</div>
           </div>
         </div>
         <div class="chart-container">
@@ -115,12 +149,12 @@
         </div>
       </div>
 
-      <!-- Meal Distribution Doughnut -->
+      <!-- Chart 2: By Meal Type -->
       <div class="chart-card card hover-lift">
         <div class="card-header">
           <div>
-            <div class="card-title">By Meal Type</div>
-            <div class="card-subtitle">Last 30 days distribution</div>
+            <div class="card-title">2. Food Waste by Meal Type</div>
+            <div class="card-subtitle">Distribution across Breakfast, Lunch, Snacks, Dinner</div>
           </div>
         </div>
         <div class="chart-container">
@@ -129,37 +163,77 @@
       </div>
     </div>
 
-    <!-- Bottom Charts Row -->
-    <div class="charts-grid-bottom">
-      <!-- CO₂ Trend Line -->
-      <div class="chart-card card hover-lift" style="grid-column: span 2">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Carbon Emission Trend</div>
-            <div class="card-subtitle">Daily CO₂ over the last 30 days</div>
-          </div>
-        </div>
-        <div class="chart-container">
-          <canvas id="chart-emissions"></canvas>
-        </div>
-      </div>
-
-      <!-- Top Wasted Items -->
+    <!-- Charts Row 2: Monthly Trends (Chart 3) & Hostel Comparison (Chart 4) -->
+    <div class="charts-grid" style="margin-top:var(--space-6)">
+      <!-- Chart 3: Monthly Trends -->
       <div class="chart-card card hover-lift">
         <div class="card-header">
           <div>
-            <div class="card-title">🏆 Top Wasted</div>
-            <div class="card-subtitle">Most wasted food items (30 days)</div>
+            <div class="card-title">3. Monthly Food Waste Trends</div>
+            <div class="card-subtitle">Prepared vs. Wasted food over past months</div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chart-monthly-trends"></canvas>
+        </div>
+      </div>
+
+      <!-- Chart 4: Hostel-wise Comparison -->
+      <div class="chart-card card hover-lift">
+        <div class="card-header">
+          <div>
+            <div class="card-title">4. SIT Hostel-Wise Food Waste</div>
+            <div class="card-subtitle">Comparison across all 6 SIT residential blocks</div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chart-hostel-comparison"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row 3: Category Breakdown (Chart 5), Emissions Trend (Chart 6), and Top Wasted (Chart 7) -->
+    <div class="charts-grid-bottom" style="margin-top:var(--space-6);grid-template-columns: 1.2fr 1fr">
+      <!-- Chart 5: Category Breakdown -->
+      <div class="chart-card card hover-lift">
+        <div class="card-header">
+          <div>
+            <div class="card-title">5. CO₂e Emissions by Food Category</div>
+            <div class="card-subtitle">Emissions breakdown (Grains, Dairy, Legumes, Veggies, etc.)</div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chart-category"></canvas>
+        </div>
+      </div>
+
+      <!-- Chart 7: Top Wasted Items -->
+      <div class="chart-card card hover-lift">
+        <div class="card-header">
+          <div>
+            <div class="card-title">7. 🏆 Most Wasted Food Items</div>
+            <div class="card-subtitle">Highest cumulative waste in kg (past 30 days)</div>
           </div>
         </div>
         <div class="top-wasted-list" id="top-wasted-list">
-          <!-- Populated by JS -->
           <div class="skeleton" style="height:40px;margin-bottom:8px">&nbsp;</div>
           <div class="skeleton" style="height:40px;margin-bottom:8px">&nbsp;</div>
           <div class="skeleton" style="height:40px;margin-bottom:8px">&nbsp;</div>
           <div class="skeleton" style="height:40px;margin-bottom:8px">&nbsp;</div>
-          <div class="skeleton" style="height:40px">&nbsp;</div>
         </div>
+      </div>
+    </div>
+
+    <!-- Chart 6: 30-Day Carbon Emission Trend Line (Full Width) -->
+    <div class="card hover-lift" style="margin-top:var(--space-6)">
+      <div class="card-header">
+        <div>
+          <div class="card-title">6. Carbon Emission Trend Line</div>
+          <div class="card-subtitle">Daily CO₂e emissions over the last 30 days</div>
+        </div>
+      </div>
+      <div class="chart-container" style="height:280px">
+        <canvas id="chart-emissions"></canvas>
       </div>
     </div>
   </main>

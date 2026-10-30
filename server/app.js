@@ -10,12 +10,15 @@ const path    = require('path');
 const { errorHandler } = require('./middleware/errorHandler');
 
 // Route modules
-const authRoutes      = require('./routes/authRoutes');
-const menuRoutes      = require('./routes/menuRoutes');
-const wasteRoutes     = require('./routes/wasteRoutes');
-const dashboardRoutes = require('./routes/dashboardRoutes');
-const reportRoutes    = require('./routes/reportRoutes');
-const settingsRoutes  = require('./routes/settingsRoutes');
+const authRoutes       = require('./routes/authRoutes');
+const menuRoutes       = require('./routes/menuRoutes');
+const wasteRoutes      = require('./routes/wasteRoutes');
+const dashboardRoutes  = require('./routes/dashboardRoutes');
+const reportRoutes     = require('./routes/reportRoutes');
+const settingsRoutes   = require('./routes/settingsRoutes');
+const hostelRoutes     = require('./routes/hostelRoutes');
+const foodRecordRoutes = require('./routes/foodRecordRoutes');
+const carbonCalcRoutes = require('./routes/carbonCalcRoutes');
 
 const app = express();
 
@@ -57,12 +60,15 @@ app.get(['/', '/index.html'], (req, res) => {
 app.use(express.static(path.join(__dirname, '../public')));
 
 // ── API Routes ────────────────────────────────────────────
-app.use('/api/auth',      authRoutes);
-app.use('/api/menus',     menuRoutes);
-app.use('/api/waste',     wasteRoutes);
-app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/reports',   reportRoutes);
+app.use('/api/auth',              authRoutes);
+app.use('/api/menus',             menuRoutes);
+app.use('/api/waste',             wasteRoutes);
+app.use('/api/dashboard',         dashboardRoutes);
+app.use('/api/reports',           reportRoutes);
 app.use('/api/settings/food-items', settingsRoutes);
+app.use('/api/hostels',           hostelRoutes);
+app.use('/api/food-records',      foodRecordRoutes);
+app.use('/api/carbon-calculator', carbonCalcRoutes);
 
 // ── Catch-all: serve Dashboard for unknown routes ─────────
 app.get('*', (req, res) => {

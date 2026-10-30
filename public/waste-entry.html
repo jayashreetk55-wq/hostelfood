@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Log Waste — Food Waste Tracker</title>
-  <meta name="description" content="Log food waste and automatically calculate carbon emissions for college hostel meals.">
+  <title>Add Food Record — SIT Hostel Food Waste & Carbon Tracker</title>
+  <meta name="description" content="Manual food data entry and waste tracking across SIT hostel messes.">
 
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/reset.css">
@@ -13,28 +13,70 @@
   <link rel="stylesheet" href="css/animations.css">
 
   <style>
-    .entry-grid {
+    .entry-layout {
       display: grid;
-      grid-template-columns: 420px 1fr;
+      grid-template-columns: 480px 1fr;
       gap: var(--space-6);
       align-items: start;
     }
-    @media (max-width: 1100px) { .entry-grid { grid-template-columns: 1fr; } }
-
-    .preview-card {
-      background: linear-gradient(135deg, var(--bg-card-2), var(--bg-card));
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: var(--space-5);
-      margin-top: var(--space-5);
+    @media (max-width: 1200px) {
+      .entry-layout { grid-template-columns: 1fr; }
     }
-    .preview-card h3 { font-size: var(--text-sm); font-weight: 700; margin-bottom: var(--space-4); color: var(--txt-secondary); text-transform: uppercase; letter-spacing: 0.06em; }
-    .preview-row { display: flex; justify-content: space-between; align-items: center; padding: var(--space-3) 0; border-bottom: 1px solid var(--border); font-size: var(--text-sm); }
-    .preview-row:last-child { border-bottom: none; }
-    .preview-row .label { color: var(--txt-secondary); }
-    .preview-row .value { font-weight: 700; color: var(--txt-primary); }
-    .preview-row .value.green { color: var(--clr-primary-light); }
-    .preview-row .value.amber { color: var(--clr-accent-light); }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-3);
+    }
+    .form-grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-2);
+    }
+    @media (max-width: 600px) {
+      .form-grid-4 { grid-template-columns: 1fr 1fr; }
+    }
+
+    .staged-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-3);
+      margin-top: var(--space-4);
+      margin-bottom: var(--space-4);
+    }
+    .staged-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-xs);
+    }
+    .staged-table th, .staged-table td {
+      padding: var(--space-2);
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    .staged-table th { color: var(--txt-secondary); }
+
+    .live-calc-box {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(245, 158, 11, 0.08));
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-md);
+      padding: var(--space-3);
+      margin: var(--space-3) 0;
+    }
+    .live-calc-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: var(--text-xs);
+      padding: 3px 0;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: var(--space-3);
+      margin-top: var(--space-4);
+      flex-wrap: wrap;
+    }
   </style>
 </head>
 <body>
@@ -42,13 +84,14 @@
   <nav class="sidebar">
     <div class="sidebar-logo">
       <div class="logo-icon">🍽️</div>
-      <div class="logo-text">Food Waste<span>Tracker</span></div>
+      <div class="logo-text">SIT Hostel<span>Tracker</span></div>
     </div>
     <div class="sidebar-nav">
       <div class="nav-section-label">Main</div>
       <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+      <a href="waste-entry.html" class="nav-item active"><span class="nav-icon">📝</span> Add Food Record</a>
+      <a href="calculator.html" class="nav-item"><span class="nav-icon">🌱</span> Carbon Calculator</a>
       <a href="menu.html" class="nav-item"><span class="nav-icon">📋</span> Menus</a>
-      <a href="waste-entry.html" class="nav-item active"><span class="nav-icon">♻️</span> Log Waste</a>
       <div class="nav-section-label">Analytics</div>
       <a href="reports.html" class="nav-item"><span class="nav-icon">📈</span> Reports</a>
       <div class="nav-section-label">System</div>
@@ -58,8 +101,8 @@
       <div class="user-info">
         <div class="user-avatar" data-user-avatar>A</div>
         <div class="user-meta">
-          <div class="user-name" data-user-name>Loading...</div>
-          <div class="user-role" data-user-role>—</div>
+          <div class="user-name" data-user-name>Hostel Admin</div>
+          <div class="user-role" data-user-role>admin</div>
         </div>
       </div>
       <button id="logout-btn" class="btn btn-ghost btn-sm btn-block">🚪 Sign Out</button>
@@ -69,149 +112,331 @@
   <!-- TOPBAR -->
   <header class="topbar">
     <div>
-      <div class="topbar-title">Log Food Waste</div>
-      <div class="topbar-subtitle">Record waste after each meal</div>
+      <div class="topbar-title">Add Food Record</div>
+      <div class="topbar-subtitle">Manual data entry for SIT hostels and mess operations</div>
+    </div>
+    <div class="topbar-right">
+      <a href="#records-section" class="btn btn-secondary btn-sm" id="btn-view-records-top">📜 View All Records</a>
     </div>
   </header>
 
   <!-- MAIN CONTENT -->
   <main class="main-content page-content">
     <div class="page-header">
-      <h1>Log Food Waste</h1>
-      <p>Select a date, meal, and food item — then enter how much was wasted. CO₂ is calculated automatically.</p>
+      <h1>Manual Food & Waste Entry</h1>
+      <p>Log prepared, served, leftover, and discarded quantities across SIT hostels with automated carbon accounting.</p>
     </div>
 
-    <div class="entry-grid">
+    <div class="entry-layout">
       <!-- LEFT: Entry Form -->
       <div>
-        <div class="card" id="entry-form-section">
+        <div class="card" id="form-card">
           <div class="card-header">
-            <div class="card-title">📝 New Waste Entry</div>
+            <div class="card-title">📝 Meal Details & Food Items</div>
           </div>
 
-          <form id="waste-entry-form" novalidate>
-            <!-- Date -->
-            <div class="form-group">
-              <label class="form-label" for="entry-date">Date</label>
-              <input type="date" id="entry-date" class="form-control" required>
+          <form id="food-entry-form" novalidate>
+            <!-- Date & Time -->
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label" for="entry-date">Date *</label>
+                <input type="date" id="entry-date" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="entry-time">Time *</label>
+                <input type="time" id="entry-time" class="form-control" required>
+              </div>
             </div>
 
-            <!-- Meal Selector (loaded from API) -->
+            <!-- Hostel & Mess -->
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label" for="entry-hostel">Hostel (SIT) *</label>
+                <select id="entry-hostel" class="form-control" required>
+                  <option value="">Select Hostel...</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="entry-mess">Mess *</label>
+                <input type="text" id="entry-mess" class="form-control" placeholder="Mess Name" required>
+              </div>
+            </div>
+
+            <!-- Meal Type -->
             <div class="form-group">
-              <label class="form-label" for="entry-meal">Meal</label>
-              <select id="entry-meal" class="form-control" required>
-                <option value="">Select meal...</option>
+              <label class="form-label" for="entry-meal-type">Meal Type *</label>
+              <select id="entry-meal-type" class="form-control" required>
+                <option value="breakfast">🌅 Breakfast</option>
+                <option value="lunch" selected>☀️ Lunch</option>
+                <option value="evening_snacks">☕ Evening Snacks</option>
+                <option value="dinner">🌙 Dinner</option>
               </select>
-              <p class="form-hint">Only meals with a menu for the selected date are shown.</p>
             </div>
 
-            <!-- Food Item Selector (loaded from selected menu) -->
-            <div class="form-group">
-              <label class="form-label" for="entry-item">Food Item</label>
-              <select id="entry-item" class="form-control" required>
-                <option value="">Select food item...</option>
+            <hr style="border-color:var(--border);margin:var(--space-4) 0">
+
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-3)">
+              <div style="font-weight:700;font-size:var(--text-sm);color:var(--clr-primary-light)">
+                🍲 Food Item Input
+              </div>
+              <button type="button" class="btn btn-ghost btn-sm" id="btn-toggle-custom" style="font-size:var(--text-xs)">
+                + Add Custom Item
+              </button>
+            </div>
+
+            <!-- Food Item Dropdown -->
+            <div class="form-group" id="group-food-select">
+              <label class="form-label" for="entry-food-select">Select Food Item *</label>
+              <select id="entry-food-select" class="form-control">
+                <option value="">Choose item...</option>
               </select>
             </div>
 
-            <!-- Quantity Wasted -->
-            <div class="form-group">
-              <label class="form-label" for="entry-qty">Quantity Wasted</label>
-              <input type="number" id="entry-qty" class="form-control" min="0" step="0.01" placeholder="Enter amount wasted" required>
-              <p class="form-hint">Use the same unit shown in the food item dropdown.</p>
-            </div>
-
-            <!-- Notes -->
-            <div class="form-group">
-              <label class="form-label" for="entry-notes">Notes (Optional)</label>
-              <input type="text" id="entry-notes" class="form-control" placeholder="e.g. Power cut caused delay...">
-            </div>
-
-            <!-- Live CO₂ Preview -->
-            <div id="preview-section" style="display:none">
-              <div class="preview-card">
-                <h3>⚡ Live Preview</h3>
-                <div class="preview-row">
-                  <span class="label">Planned Quantity</span>
-                  <span class="value green" id="preview-planned">—</span>
+            <!-- Custom Food Item Fields (hidden by default) -->
+            <div id="custom-food-fields" style="display:none;background:var(--bg-card-2);padding:var(--space-3);border-radius:var(--radius-md);margin-bottom:var(--space-3)">
+              <div class="form-group">
+                <label class="form-label" for="custom-name">Custom Item Name *</label>
+                <input type="text" id="custom-name" class="form-control" placeholder="e.g. Masala Dosa">
+              </div>
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label class="form-label" for="custom-category">Category</label>
+                  <select id="custom-category" class="form-control">
+                    <option value="Grain">🌾 Grain</option>
+                    <option value="Legume">🫘 Legume</option>
+                    <option value="Vegetable">🥦 Vegetable</option>
+                    <option value="Fruit">🍎 Fruit</option>
+                    <option value="Dairy">🥛 Dairy</option>
+                    <option value="Non-Veg">🍗 Non-Veg</option>
+                    <option value="Snack">🥟 Snack</option>
+                    <option value="Beverage">☕ Beverage</option>
+                    <option value="Other">📦 Other</option>
+                  </select>
                 </div>
-                <div class="preview-row">
-                  <span class="label">Waste Percentage</span>
-                  <span class="value amber" id="preview-waste-pct">—</span>
-                </div>
-                <div class="preview-row">
-                  <span class="label">Carbon Emission</span>
-                  <span class="value amber" id="preview-co2">—</span>
+                <div class="form-group">
+                  <label class="form-label" for="custom-ef">Emission Factor (kg CO₂/kg)</label>
+                  <input type="number" id="custom-ef" class="form-control" step="0.01" min="0" value="1.0">
                 </div>
               </div>
-              <div id="preview-level" class="co2-banner low" style="margin-top:var(--space-3);display:none">—</div>
             </div>
 
-            <button id="waste-submit" type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top:var(--space-5)">
-              💾 Log Waste
-            </button>
-          </form>
-        </div>
+            <!-- Quantities: Prepared, Served, Leftover, Discarded -->
+            <div class="form-group">
+              <label class="form-label">Quantities (in selected unit) *</label>
+              <div class="form-grid-4">
+                <div>
+                  <label style="font-size:10px;color:var(--txt-secondary)">Prepared</label>
+                  <input type="number" id="qty-prepared" class="form-control" min="0" step="0.01" placeholder="0" required>
+                </div>
+                <div>
+                  <label style="font-size:10px;color:var(--txt-secondary)">Served</label>
+                  <input type="number" id="qty-served" class="form-control" min="0" step="0.01" placeholder="0" required>
+                </div>
+                <div>
+                  <label style="font-size:10px;color:var(--txt-secondary)">Leftover</label>
+                  <input type="number" id="qty-leftover" class="form-control" min="0" step="0.01" placeholder="0" required>
+                </div>
+                <div>
+                  <label style="font-size:10px;color:var(--txt-secondary)">Discarded</label>
+                  <input type="number" id="qty-discarded" class="form-control" min="0" step="0.01" placeholder="0" required>
+                </div>
+              </div>
+            </div>
 
-        <!-- Viewer notice -->
-        <div class="card" id="viewer-notice" style="display:none">
-          <p style="color:var(--txt-secondary);text-align:center;padding:var(--space-4)">
-            👁️ You have view-only access. Only managers and admins can log waste.
-          </p>
+            <!-- Unit & Category -->
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label" for="entry-unit">Unit *</label>
+                <select id="entry-unit" class="form-control" required>
+                  <option value="kg">kg (kilograms)</option>
+                  <option value="g">g (grams)</option>
+                  <option value="litres">litres (L)</option>
+                  <option value="ml">ml (millilitres)</option>
+                  <option value="pieces">pieces (pcs)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="entry-reason">Reason for Wastage</label>
+                <select id="entry-reason" class="form-control">
+                  <option value="Normal plate leftover">Plate waste / Uneaten</option>
+                  <option value="Excess preparation">Over-prepared / Excess cooked</option>
+                  <option value="Sudden student absence">Sudden student absence</option>
+                  <option value="Spillage or burn">Kitchen spillage / burnt</option>
+                  <option value="Quality or taste issue">Taste or quality issue</option>
+                  <option value="Storage spoilage">Storage / shelf-life expiry</option>
+                  <option value="Other">Other (specify in remarks)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Remarks -->
+            <div class="form-group">
+              <label class="form-label" for="entry-remarks">Remarks (Optional)</label>
+              <input type="text" id="entry-remarks" class="form-control" placeholder="Any context or notes...">
+            </div>
+
+            <!-- Live Calculation Preview -->
+            <div class="live-calc-box" id="live-calc-box">
+              <div class="live-calc-row">
+                <span style="color:var(--txt-secondary)">Effective Waste (kg):</span>
+                <strong id="live-waste-kg">0.00 kg</strong>
+              </div>
+              <div class="live-calc-row">
+                <span style="color:var(--txt-secondary)">Emission Factor:</span>
+                <span id="live-ef-source">1.00 kg CO₂e/kg (IPCC/FAO)</span>
+              </div>
+              <div class="live-calc-row">
+                <span style="color:var(--txt-secondary)">Estimated CO₂e:</span>
+                <strong style="color:var(--clr-accent-light);font-size:var(--text-sm)" id="live-co2">0.000 kg CO₂e</strong>
+              </div>
+            </div>
+
+            <!-- Button to stage item for batching -->
+            <button type="button" class="btn btn-secondary btn-block btn-sm" id="btn-add-item-queue">
+              ➕ Add Another Food Item to this Meal
+            </button>
+
+            <!-- Staged Items Queue (for multi-item support) -->
+            <div class="staged-card" id="staged-container" style="display:none">
+              <div style="font-weight:700;font-size:var(--text-xs);margin-bottom:var(--space-2);color:var(--txt-secondary)">
+                ITEMS READY FOR THIS MEAL (<span id="staged-count">0</span>):
+              </div>
+              <table class="staged-table">
+                <thead>
+                  <tr>
+                    <th>Item</th><th>Prep</th><th>Serv</th><th>Disc</th><th>CO₂e</th><th></th>
+                  </tr>
+                </thead>
+                <tbody id="staged-tbody"></tbody>
+              </table>
+            </div>
+
+            <!-- Form Action Buttons -->
+            <div class="btn-row">
+              <button type="submit" class="btn btn-primary" id="btn-save-record" style="flex:2">
+                💾 Save Record
+              </button>
+              <button type="button" class="btn btn-secondary" id="btn-clear-form" style="flex:1">
+                🧹 Clear Form
+              </button>
+              <button type="button" class="btn btn-ghost" id="btn-view-records" style="flex:1">
+                👁️ View Records
+              </button>
+            </div>
+          </form>
         </div>
       </div>
 
-      <!-- RIGHT: Waste Entries Table -->
-      <div>
+      <!-- RIGHT: Records Table with Filters -->
+      <div id="records-section">
         <div class="card">
           <div class="card-header">
-            <div class="card-title">📜 Waste Entries</div>
-            <div style="display:flex;gap:var(--space-3)">
-              <input type="date" id="filter-start" class="form-control" style="width:auto">
-              <input type="date" id="filter-end"   class="form-control" style="width:auto">
+            <div>
+              <div class="card-title">📜 SIT Hostel Food Records</div>
+              <div class="card-subtitle">Real SQLite database entries with complete metrics</div>
             </div>
+          </div>
+
+          <!-- Table Filters -->
+          <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;margin-bottom:var(--space-4);padding:var(--space-3);background:var(--bg-card-2);border-radius:var(--radius-md)">
+            <select id="filter-hostel" class="form-control" style="width:auto;flex:1;min-width:160px">
+              <option value="all">All SIT Hostels</option>
+            </select>
+            <select id="filter-meal" class="form-control" style="width:auto;flex:1;min-width:140px">
+              <option value="all">All Meals</option>
+              <option value="breakfast">Breakfast</option>
+              <option value="lunch">Lunch</option>
+              <option value="evening_snacks">Evening Snacks</option>
+              <option value="dinner">Dinner</option>
+            </select>
+            <input type="date" id="filter-date" class="form-control" style="width:auto;flex:1;min-width:140px">
+            <button class="btn btn-secondary btn-sm" id="btn-reset-filters">Reset</button>
           </div>
 
           <div class="table-wrapper">
             <table class="data-table">
               <thead>
                 <tr>
-                  <th>Date</th><th>Meal</th><th>Food Item</th>
-                  <th>Wasted</th><th>Waste %</th><th>CO₂</th>
-                  <th>Logged By</th><th>Actions</th>
+                  <th>Date & Time</th>
+                  <th>Hostel & Mess</th>
+                  <th>Meal</th>
+                  <th>Food Item</th>
+                  <th>Prep / Serv</th>
+                  <th>Discarded</th>
+                  <th>CO₂e</th>
+                  <th>Reason</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
-              <tbody id="waste-tbody"></tbody>
+              <tbody id="records-tbody">
+                <!-- Populated via JS -->
+              </tbody>
             </table>
           </div>
-          <div id="waste-empty" class="empty-state" style="display:none">
+          <div id="records-empty" class="empty-state" style="display:none">
             <div class="empty-icon">🎉</div>
-            <p>No waste entries found for this date range!</p>
+            <p>No food records found matching the selected filters.</p>
           </div>
         </div>
       </div>
     </div>
   </main>
 
-  <!-- Edit Waste Modal -->
+  <!-- Edit Record Modal -->
   <div class="modal-overlay" id="edit-modal">
-    <div class="modal">
+    <div class="modal" style="max-width:550px">
       <div class="modal-header">
-        <h2 class="modal-title">✏️ Edit Waste Entry</h2>
-        <button class="modal-close" onclick="document.getElementById('edit-modal').classList.remove('active')">✕</button>
+        <h2 class="modal-title">✏️ Update Food Record</h2>
+        <button class="modal-close" onclick="closeEditModal()">✕</button>
       </div>
-      <form id="edit-waste-form">
-        <input type="hidden" id="edit-waste-id">
+      <form id="edit-record-form">
+        <input type="hidden" id="edit-record-id">
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Food Item</label>
+            <input type="text" id="edit-food-name" class="form-control" readonly>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Unit</label>
+            <input type="text" id="edit-unit" class="form-control" readonly>
+          </div>
+        </div>
+
         <div class="form-group">
-          <label class="form-label">Quantity Wasted (corrected)</label>
-          <input type="number" id="edit-qty" class="form-control" min="0" step="0.01" required>
+          <label class="form-label">Quantities</label>
+          <div class="form-grid-4">
+            <div>
+              <label style="font-size:10px;color:var(--txt-secondary)">Prepared</label>
+              <input type="number" id="edit-qty-prepared" class="form-control" min="0" step="0.01" required>
+            </div>
+            <div>
+              <label style="font-size:10px;color:var(--txt-secondary)">Served</label>
+              <input type="number" id="edit-qty-served" class="form-control" min="0" step="0.01" required>
+            </div>
+            <div>
+              <label style="font-size:10px;color:var(--txt-secondary)">Leftover</label>
+              <input type="number" id="edit-qty-leftover" class="form-control" min="0" step="0.01" required>
+            </div>
+            <div>
+              <label style="font-size:10px;color:var(--txt-secondary)">Discarded</label>
+              <input type="number" id="edit-qty-discarded" class="form-control" min="0" step="0.01" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="edit-reason">Reason</label>
+          <input type="text" id="edit-reason" class="form-control" placeholder="Reason for waste...">
         </div>
         <div class="form-group">
-          <label class="form-label">Notes</label>
-          <input type="text" id="edit-notes" class="form-control" placeholder="Reason for correction...">
+          <label class="form-label" for="edit-remarks">Remarks</label>
+          <input type="text" id="edit-remarks" class="form-control" placeholder="Remarks...">
         </div>
-        <div style="display:flex;gap:var(--space-3)">
-          <button type="submit" class="btn btn-primary" style="flex:1">Save Changes</button>
-          <button type="button" class="btn btn-secondary" onclick="document.getElementById('edit-modal').classList.remove('active')">Cancel</button>
+
+        <div class="btn-row">
+          <button type="submit" class="btn btn-primary" style="flex:1">💾 Update Record</button>
+          <button type="button" class="btn btn-danger btn-icon" id="btn-modal-delete" title="Delete Record">🗑️ Delete</button>
+          <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
         </div>
       </form>
     </div>
@@ -223,17 +448,5 @@
   <script src="js/utils.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/waste-entry.js"></script>
-  <script>
-    // Show viewer notice if role is viewer
-    document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(() => {
-        const role = document.querySelector('[data-user-role]')?.textContent;
-        if (role === 'viewer') {
-          document.getElementById('entry-form-section').style.display = 'none';
-          document.getElementById('viewer-notice').style.display = 'block';
-        }
-      }, 1000);
-    });
-  </script>
 </body>
 </html>
